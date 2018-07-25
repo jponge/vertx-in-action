@@ -1,0 +1,15 @@
+plugins {
+  id 'java'
+  id 'application'
+}
+
+sourceCompatibility = 1.8
+mainClassName = 'chapter1.firstapp.VertxEcho'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'io.vertx:vertx-core:3.5.2'
+}
