@@ -3,4 +3,7 @@
 target/
 build/
 .DS_Store
+*.iml
+*.iws
+*.ipr
 
