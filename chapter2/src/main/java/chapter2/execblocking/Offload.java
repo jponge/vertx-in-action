@@ -4,9 +4,9 @@ import io.vertx.core.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OffloadBlockingTask extends AbstractVerticle {
+public class Offload extends AbstractVerticle {
 
-  private final Logger logger = LoggerFactory.getLogger(OffloadBlockingTask.class);
+  private final Logger logger = LoggerFactory.getLogger(Offload.class);
 
   @Override
   public void start() {
@@ -37,6 +37,6 @@ public class OffloadBlockingTask extends AbstractVerticle {
 
   public static void main(String[] args) {
     Vertx vertx = Vertx.vertx();
-    vertx.deployVerticle(new OffloadBlockingTask());
+    vertx.deployVerticle(new Offload());
   }
 }
