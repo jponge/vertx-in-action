@@ -14,7 +14,7 @@ dependencies {
 }
 
 task run(type: JavaExec) {
-  main = project.property("mainClass")
+  main = project.findProperty("mainClass")
   classpath = sourceSets.main.runtimeClasspath
   systemProperties['vertx.logger-delegate-factory-class-name'] = 'io.vertx.core.logging.SLF4JLogDelegateFactory'
 }
