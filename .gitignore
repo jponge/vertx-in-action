@@ -2,6 +2,7 @@
 .gradle/
 target/
 build/
+out/
 .DS_Store
 *.iml
 *.iws
