@@ -7,4 +7,5 @@ out/
 *.iml
 *.iws
 *.ipr
-
+tracks/
+sample.db
