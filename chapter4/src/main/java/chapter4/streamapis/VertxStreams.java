@@ -1,10 +1,8 @@
 package chapter4.streamapis;
 
 import io.vertx.core.Vertx;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.AsyncFile;
 import io.vertx.core.file.OpenOptions;
-import io.vertx.core.streams.ReadStream;
 
 public class VertxStreams {
 
@@ -14,20 +12,15 @@ public class VertxStreams {
     vertx.fileSystem().open("build.gradle", opts, ar -> {
       if (ar.succeeded()) {
         AsyncFile file = ar.result();
-        read(vertx, file);
+        file.handler(System.out::println)
+          .exceptionHandler(Throwable::printStackTrace)
+          .endHandler(done -> {
+            System.out.println("\n--- DONE");
+            vertx.close();
+          });
       } else {
         ar.cause().printStackTrace();
       }
     });
-  }
-
-  private static void read(Vertx vertx, ReadStream<Buffer> stream) {
-    stream
-      .handler(System.out::println)
-      .exceptionHandler(Throwable::printStackTrace)
-      .endHandler(done -> {
-        System.out.println("\n--- DONE");
-        vertx.close();
-      });
   }
 }

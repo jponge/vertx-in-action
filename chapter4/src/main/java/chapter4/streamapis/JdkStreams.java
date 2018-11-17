@@ -1,20 +1,20 @@
 package chapter4.streamapis;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class JdkStreams {
 
   public static void main(String[] args) {
-    try {
-      File file = new File("build.gradle");
-      BufferedReader reader = new BufferedReader(
-        new InputStreamReader(new FileInputStream(file)));
-      String line = reader.readLine();
-      while (line != null) {
-        System.out.println(line);
-        line = reader.readLine();
+    File file = new File("build.gradle");
+    byte[] buffer = new byte[1024];
+    try (FileInputStream in = new FileInputStream(file)) {
+      int count = in.read(buffer);
+      while (count != -1) {
+        System.out.println(new String(buffer, 0, count));
+        count = in.read(buffer);
       }
-      reader.close();
     } catch (IOException e) {
       e.printStackTrace();
     } finally {
