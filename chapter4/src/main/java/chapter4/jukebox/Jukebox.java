@@ -10,6 +10,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.streams.Pump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,14 @@ public class Jukebox extends AbstractVerticle {
 
   // --------------------------------------------------------------------------------- //
 
+  private enum State {PLAYING, PAUSED}
+
+  private State currentMode = State.PAUSED;
+
+  private final Queue<String> playlist = new ArrayDeque<>();
+
+  // --------------------------------------------------------------------------------- //
+
   private void list(Message<?> request) {
     vertx.fileSystem().readDir("tracks", ".*mp3$", ar -> {
       if (ar.succeeded()) {
@@ -59,10 +68,6 @@ public class Jukebox extends AbstractVerticle {
 
   // --------------------------------------------------------------------------------- //
 
-  private enum State {PLAYING, PAUSED}
-
-  private State currentMode = State.PAUSED;
-
   private void play(Message<?> request) {
     logger.info("Play");
     currentMode = State.PLAYING;
@@ -72,10 +77,6 @@ public class Jukebox extends AbstractVerticle {
     logger.info("Pause");
     currentMode = State.PAUSED;
   }
-
-  // --------------------------------------------------------------------------------- //
-
-  private final Queue<String> playlist = new ArrayDeque<>();
 
   private void schedule(Message<JsonObject> request) {
     String file = request.body().getString("file");
@@ -152,6 +153,15 @@ public class Jukebox extends AbstractVerticle {
     });
 
     file.endHandler(v -> response.end());
+  }
+
+  private void downloadFilePump(AsyncFile file, HttpServerRequest request) {
+    HttpServerResponse response = request.response();
+    response.setStatusCode(200)
+      .putHeader("Content-Type", "audio/mpeg")
+      .setChunked(true);
+
+    Pump.pump(file, response).start();
   }
 
   // --------------------------------------------------------------------------------- //
