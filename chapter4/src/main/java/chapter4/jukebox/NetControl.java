@@ -12,6 +12,8 @@ public class NetControl extends AbstractVerticle {
 
   private final Logger logger = LoggerFactory.getLogger(NetControl.class);
 
+  // --------------------------------------------------------------------------------- //
+
   @Override
   public void start() {
     logger.info("Start");
@@ -26,6 +28,8 @@ public class NetControl extends AbstractVerticle {
       .handler(buffer -> handleBuffer(socket, buffer))
       .endHandler(v -> logger.info("Connection ended"));
   }
+
+  // --------------------------------------------------------------------------------- //
 
   private void handleBuffer(NetSocket socket, Buffer buffer) {
     String command = buffer.toString();
@@ -48,6 +52,8 @@ public class NetControl extends AbstractVerticle {
     }
   }
 
+  // --------------------------------------------------------------------------------- //
+
   private void schedule(String command) {
     String track = command.substring(10);
     JsonObject json = new JsonObject().put("file", track);
@@ -65,4 +71,6 @@ public class NetControl extends AbstractVerticle {
       }
     });
   }
+
+  // --------------------------------------------------------------------------------- //
 }
