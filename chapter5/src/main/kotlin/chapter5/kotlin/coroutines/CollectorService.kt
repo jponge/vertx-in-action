@@ -31,7 +31,7 @@ class CollectorService : CoroutineVerticle() {
   }
 
   private fun handleRequest(request: HttpServerRequest) {
-    launch(vertx.dispatcher()) {
+    launch {
       try {
         val t1 = async { fetchTemperature(3000) }
         val t2 = async { fetchTemperature(3001) }
