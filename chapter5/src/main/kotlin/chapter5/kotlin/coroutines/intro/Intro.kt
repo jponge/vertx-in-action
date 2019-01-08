@@ -1,10 +1,10 @@
 package chapter5.kotlin.coroutines.intro
 
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-suspend fun main(args: Array<String>) = coroutineScope {
+fun main(args: Array<String>) = runBlocking {
   val job1 = launch { Thread.sleep(5000) }
 
   fun fib(n: Long): Long = if (n < 2) n else fib(n - 1) + fib(n - 2)
