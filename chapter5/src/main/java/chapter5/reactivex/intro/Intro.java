@@ -9,27 +9,34 @@ import java.util.concurrent.TimeUnit;
 
 public class Intro {
 
-  public static void main(String[] args) {
-    Disposable subscription = Observable
-      .just("--", "this", "is", "--", "a", "sequence", "of", "items", "!")
-      .doOnSubscribe(d -> System.out.println("Subscribed!"))
-      .delay(5, TimeUnit.SECONDS)
-      .filter(s -> !s.startsWith("--"))
-      .doOnNext(System.out::println)
-      .map(String::toUpperCase)
-      .buffer(2)
-      .subscribe(
-        System.out::println,
-        Throwable::printStackTrace,
-        () -> System.out.println(">>> Done"));
+  public static void main(String[] args) throws InterruptedException {
+    Observable.just(1, 2, 3)
+      .map(Object::toString)
+      .map(s -> "@" + s)
+      .subscribe(System.out::println);
 
-    while (!subscription.isDisposed()) ;
+    Observable.<String>error(() -> new RuntimeException("Woops"))
+      .map(String::toUpperCase)
+      .subscribe(System.out::println, Throwable::printStackTrace);
 
     Single<String> s1 = Single.just("foo");
     Single<String> s2 = Single.just("bar");
     Flowable<String> m = Single.merge(s1, s2);
     m.subscribe(System.out::println);
 
-    while (!subscription.isDisposed()) ;
+    Observable
+      .just("--", "this", "is", "--", "a", "sequence", "of", "items", "!")
+      .doOnSubscribe(d -> System.out.println("Subscribed!"))
+      .delay(5, TimeUnit.SECONDS)
+      .filter(s -> !s.startsWith("--"))
+      .doOnNext(x -> System.out.println("doOnNext: " + x))
+      .map(String::toUpperCase)
+      .buffer(2)
+      .subscribe(
+        pair -> System.out.println("next: " + pair),
+        Throwable::printStackTrace,
+        () -> System.out.println("~Done~"));
+
+    Thread.sleep(10_000);
   }
 }

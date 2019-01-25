@@ -62,7 +62,6 @@ public class CollectorService extends AbstractVerticle {
           request.response().setStatusCode(500).end();
         }
       });
-
   }
 
   private void sendResponse(HttpServerRequest request, JsonObject data) {
