@@ -1,5 +1,6 @@
 package chapter5.reactivex;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -19,11 +20,12 @@ public class CollectorService extends AbstractVerticle {
   private WebClient webClient;
 
   @Override
-  public void start() {
+  public Completable rxStart() {
     webClient = WebClient.create(vertx);
-    vertx.createHttpServer()
+    return vertx.createHttpServer()
       .requestHandler(this::handleRequest)
-      .listen(8080);
+      .rxListen(8080)
+      .ignoreElement();
   }
 
   private void handleRequest(HttpServerRequest request) {
