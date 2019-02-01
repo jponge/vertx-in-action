@@ -6,11 +6,11 @@ import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.predicate.ResponsePredicate
 import io.vertx.ext.web.codec.BodyCodec
 import io.vertx.kotlin.core.http.listenAwait
+import io.vertx.kotlin.core.json.Json
 import io.vertx.kotlin.core.json.array
 import io.vertx.kotlin.core.json.json
 import io.vertx.kotlin.core.json.obj
 import io.vertx.kotlin.coroutines.CoroutineVerticle
-import io.vertx.kotlin.coroutines.dispatcher
 import io.vertx.kotlin.ext.web.client.sendAwait
 import io.vertx.kotlin.ext.web.client.sendJsonAwait
 import kotlinx.coroutines.async
@@ -37,16 +37,10 @@ class CollectorService : CoroutineVerticle() {
         val t2 = async { fetchTemperature(3001) }
         val t3 = async { fetchTemperature(3002) }
 
-        val json = json {
-          val array = array(t1.await(), t2.await(), t3.await())
-          obj("data" to array)
-        }
+        val array = Json.array(t1.await(), t2.await(), t3.await())
+        val json = json { obj("data" to array) }
 
-        webClient
-          .post(4000, "localhost", "/")
-          .expect(ResponsePredicate.SC_SUCCESS)
-          .sendJsonAwait(json)
-
+        sendToSnapshot(json)
         request.response()
           .putHeader("Content-Type", "application/json")
           .end(json.encode())
@@ -67,4 +61,10 @@ class CollectorService : CoroutineVerticle() {
       .body()
   }
 
+  private suspend fun sendToSnapshot(json: JsonObject) {
+    webClient
+      .post(4000, "localhost", "/")
+      .expect(ResponsePredicate.SC_SUCCESS)
+      .sendJsonAwait(json)
+  }
 }
