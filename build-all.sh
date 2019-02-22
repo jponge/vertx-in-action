@@ -2,13 +2,13 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-GRADLE_PROJECTS=('chapter1' 'chapter2' 'chapter3' 'chapter4')
-
-for project in "${GRADLE_PROJECTS[@]}"; do
+for project in chapter*; do
   cd $project
-  echo ">>> Building ${project}"
-  ./gradlew -q build
-  echo ">>> Cleaning ${project}"
-  ./gradlew -q clean
+  if [ -f build.gradle.kts ]; then
+    echo ">>> Building ${project}"
+    ./gradlew -q build
+    echo ">>> Cleaning ${project}"
+    ./gradlew -q clean
+  fi
   cd ..
 done
