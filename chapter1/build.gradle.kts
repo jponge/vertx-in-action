@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.6.2")
+  implementation("io.vertx:vertx-core:3.6.3")
 }
 
 java {
@@ -20,5 +20,5 @@ application {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.1"
+  gradleVersion = "5.2.1"
 }
