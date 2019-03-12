@@ -20,11 +20,7 @@ class SensorDataServiceTest {
 
   @BeforeEach
   void prepare(Vertx vertx) {
-    SensorDataService service = SensorDataService.create(vertx);
-    new ServiceBinder(vertx)
-      .setAddress("sensor.data-service")
-      .register(SensorDataService.class, service);
-
+    vertx.deployVerticle(new DataVerticle());
     dataService = SensorDataService.createProxy(vertx, "sensor.data-service");
   }
 
