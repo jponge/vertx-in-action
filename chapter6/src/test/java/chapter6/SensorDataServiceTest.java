@@ -19,9 +19,11 @@ class SensorDataServiceTest {
   private SensorDataService dataService;
 
   @BeforeEach
-  void prepare(Vertx vertx) {
-    vertx.deployVerticle(new DataVerticle());
-    dataService = SensorDataService.createProxy(vertx, "sensor.data-service");
+  void prepare(Vertx vertx, VertxTestContext ctx) {
+    vertx.deployVerticle(new DataVerticle(), ctx.succeeding(id -> {
+      dataService = SensorDataService.createProxy(vertx, "sensor.data-service");
+      ctx.completeNow();
+    }));
   }
 
   @Test
