@@ -7,10 +7,10 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.6.3")
+  implementation("io.vertx:vertx-core:3.7.0")
   implementation("ch.qos.logback:logback-classic:1.2.3")
   testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
-  testCompile("io.vertx:vertx-junit5:3.6.3")
+  testCompile("io.vertx:vertx-junit5:3.7.0")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }
 

@@ -155,13 +155,12 @@ public class Jukebox extends AbstractVerticle {
     file.endHandler(v -> response.end());
   }
 
-  private void downloadFilePump(AsyncFile file, HttpServerRequest request) {
+  private void downloadFilePipe(AsyncFile file, HttpServerRequest request) {
     HttpServerResponse response = request.response();
     response.setStatusCode(200)
       .putHeader("Content-Type", "audio/mpeg")
       .setChunked(true);
-
-    Pump.pump(file, response).start();
+    file.pipeTo(response);
   }
 
   // --------------------------------------------------------------------------------- //
