@@ -16,6 +16,7 @@ import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.mongo.MongoClient;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 @ExtendWith(VertxExtension.class)
 class ApiTest {
@@ -86,7 +88,7 @@ class ApiTest {
 
   @Test
   void register() {
-    JsonPath jsonPath = given()
+    String response = given()
       .spec(requestSpecification)
       .contentType(ContentType.JSON)
       .accept(ContentType.JSON)
@@ -97,11 +99,9 @@ class ApiTest {
       .assertThat()
       .statusCode(200)
       .contentType(ContentType.JSON)
-      .and()
       .extract()
-      .jsonPath();
-
-    assertThat(jsonPath.getString("id")).isNotNull();
+      .asString();
+    assertThat(response).isEmpty();
   }
 
   @Test

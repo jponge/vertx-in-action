@@ -81,10 +81,9 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   private void completeRegistration(RoutingContext ctx, JsonObject json) {
-    JsonObject response = new JsonObject().put("id", json.getString("_id"));
     ctx.response()
       .putHeader("Content-Type", "application/json")
-      .end(response.encode());
+      .end();
   }
 
   private void handleRegistrationError(RoutingContext ctx, Throwable err) {
