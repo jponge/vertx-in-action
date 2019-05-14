@@ -99,21 +99,29 @@ public class UserProfileApiVerticle extends AbstractVerticle {
 
   private void fetchUser(RoutingContext ctx) {
     String username = ctx.pathParam("username");
+
     JsonObject query = new JsonObject()
       .put("username", username);
+
     JsonObject fields = new JsonObject()
       .put("_id", 0)
       .put("username", 1)
       .put("deviceId", 1)
       .put("city", 1)
       .put("makePublic", 1);
+
     mongoClient
       .rxFindOne("user", query, fields)
       .toSingle()
-      .subscribe(entries -> {
-        ctx.response().end(entries.encode());
-      }, err ->
-        handleFetchError(ctx, err));
+      .subscribe(
+        json -> completeFetchRequest(ctx, json),
+        err -> handleFetchError(ctx, err));
+  }
+
+  private void completeFetchRequest(RoutingContext ctx, JsonObject json) {
+    ctx.response()
+      .putHeader("Content-Type", "application/json")
+      .end(json.encode());
   }
 
   private void handleFetchError(RoutingContext ctx, Throwable err) {
