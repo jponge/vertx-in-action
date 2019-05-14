@@ -12,6 +12,8 @@ import io.vertx.reactivex.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.NoSuchElementException;
+
 import static java.util.Collections.emptyList;
 
 public class UserProfileApiVerticle extends AbstractVerticle {
@@ -38,6 +40,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     Router router = Router.router(vertx);
     router.post().handler(BodyHandler.create());
     router.post("/register").handler(this::register);
+    router.get("/:username").handler(this::fetchUser);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -52,7 +55,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       return;
     }
 
-    String login = body.getString("login");
+    String username = body.getString("username");
     String password = body.getString("password");
 
     JsonObject extraInfo = new JsonObject()
@@ -62,7 +65,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
         .put("makePublic", body.getBoolean("makePublic")));
 
     authProvider
-      .rxInsertUser(login, password, emptyList(), emptyList())
+      .rxInsertUser(username, password, emptyList(), emptyList())
       .flatMapMaybe(docId -> {
         JsonObject query = new JsonObject().put("_id", docId);
         return mongoClient.rxFindOneAndUpdate("user", query, extraInfo);
@@ -73,7 +76,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   private boolean isValidRegistrationRequest(JsonObject json) {
-    return json.containsKey("login") &&
+    return json.containsKey("username") &&
       json.containsKey("password") &&
       json.containsKey("city") &&
       json.containsKey("deviceId") &&
@@ -89,6 +92,33 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   private void handleRegistrationError(RoutingContext ctx, Throwable err) {
     if (err.getMessage().contains("E11000")) {
       ctx.fail(409);
+    } else {
+      fail500(ctx, err);
+    }
+  }
+
+  private void fetchUser(RoutingContext ctx) {
+    String username = ctx.pathParam("username");
+    JsonObject query = new JsonObject()
+      .put("username", username);
+    JsonObject fields = new JsonObject()
+      .put("_id", 0)
+      .put("username", 1)
+      .put("deviceId", 1)
+      .put("city", 1)
+      .put("makePublic", 1);
+    mongoClient
+      .rxFindOne("user", query, fields)
+      .toSingle()
+      .subscribe(entries -> {
+        ctx.response().end(entries.encode());
+      }, err ->
+        handleFetchError(ctx, err));
+  }
+
+  private void handleFetchError(RoutingContext ctx, Throwable err) {
+    if (err instanceof NoSuchElementException) {
+      ctx.fail(404);
     } else {
       fail500(ctx, err);
     }

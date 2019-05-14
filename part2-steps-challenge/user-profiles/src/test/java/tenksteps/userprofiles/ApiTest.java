@@ -79,7 +79,7 @@ class ApiTest {
 
   private JsonObject basicUser() {
     return new JsonObject()
-      .put("login", "abc")
+      .put("username", "abc")
       .put("password", "123")
       .put("city", "Lyon")
       .put("deviceId", "a1b2c3")
@@ -142,5 +142,44 @@ class ApiTest {
       .then()
       .assertThat()
       .statusCode(400);
+  }
+
+  @Test
+  void registerThenFetch() {
+    JsonObject user = basicUser();
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .post("/register");
+
+    JsonPath jsonPath = given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .when()
+      .get("/" + user.getString("username"))
+      .then()
+      .assertThat()
+      .statusCode(200)
+      .extract()
+      .jsonPath();
+
+    assertThat(jsonPath.getString("username")).isEqualTo(user.getString("username"));
+    assertThat(jsonPath.getString("deviceId")).isEqualTo(user.getString("deviceId"));
+    assertThat(jsonPath.getString("city")).isEqualTo(user.getString("city"));
+    assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(user.getBoolean("makePublic"));
+  }
+
+  @Test
+  void fetchUnknownUser() {
+    given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .when()
+      .get("/foo-bar-baz")
+      .then()
+      .statusCode(404);
   }
 }
