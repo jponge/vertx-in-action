@@ -51,6 +51,7 @@ class ApiTest {
 
     mongoClient
       .rxCreateIndexWithOptions("user", new JsonObject().put("username", 1), new IndexOptions().unique(true))
+      .andThen(mongoClient.rxCreateIndexWithOptions("user", new JsonObject().put("deviceId", 1), new IndexOptions().unique(true)))
       .andThen(dropAllUsers())
       .flatMap(res -> vertx.rxDeployVerticle(new UserProfileApiVerticle()))
       .subscribe(
@@ -92,7 +93,6 @@ class ApiTest {
       .then()
       .assertThat()
       .statusCode(200)
-      .contentType(ContentType.JSON)
       .extract()
       .asString();
     assertThat(response).isEmpty();
@@ -109,14 +109,41 @@ class ApiTest {
       .post("/register")
       .then()
       .assertThat()
-      .statusCode(200)
-      .contentType(ContentType.JSON);
+      .statusCode(200);
 
     given()
       .spec(requestSpecification)
       .contentType(ContentType.JSON)
       .accept(ContentType.JSON)
       .body(basicUser().encode())
+      .when()
+      .post("/register")
+      .then()
+      .assertThat()
+      .statusCode(409);
+  }
+
+  @Test
+  void registerExistingDeviceId() {
+    given()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(basicUser().encode())
+      .when()
+      .post("/register")
+      .then()
+      .assertThat()
+      .statusCode(200);
+
+    JsonObject user = basicUser()
+      .put("username", "Bean");
+
+    given()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
       .when()
       .post("/register")
       .then()
@@ -215,7 +242,8 @@ class ApiTest {
       .jsonPath();
 
     assertThat(jsonPath.getString("username")).isEqualTo(original.getString("username"));
-    assertThat(jsonPath.getString("deviceId")).isEqualTo(updated.getString("deviceId"));
+    assertThat(jsonPath.getString("deviceId")).isEqualTo(original.getString("deviceId"));
+
     assertThat(jsonPath.getString("city")).isEqualTo(updated.getString("city"));
     assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(updated.getBoolean("makePublic"));
   }

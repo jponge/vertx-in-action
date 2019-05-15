@@ -150,9 +150,6 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .put("username", username);
 
     JsonObject updates = new JsonObject();
-    if (body.containsKey("deviceId")) {
-      updates.put("deviceId", body.getString("deviceId"));
-    }
     if (body.containsKey("city")) {
       updates.put("city", body.getString("city"));
     }
