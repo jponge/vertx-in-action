@@ -38,9 +38,12 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     authProvider = MongoAuth.create(mongoClient, authConfig);
 
     Router router = Router.router(vertx);
-    router.post().handler(BodyHandler.create());
+    BodyHandler bodyHandler = BodyHandler.create();
+    router.post().handler(bodyHandler);
+    router.put().handler(bodyHandler);
     router.post("/register").handler(this::register);
     router.get("/:username").handler(this::fetchUser);
+    router.put("/:username").handler(this::updateUser);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -49,7 +52,8 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   private void register(RoutingContext ctx) {
-    JsonObject body = ctx.getBodyAsJson();
+    JsonObject body = jsonBody(ctx);
+
     if (!isValidRegistrationRequest(body)) {
       ctx.fail(400);
       return;
@@ -73,6 +77,14 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .subscribe(
         ok -> completeRegistration(ctx),
         err -> handleRegistrationError(ctx, err));
+  }
+
+  private JsonObject jsonBody(RoutingContext ctx) {
+    if (ctx.getBody().length() == 0) {
+      return new JsonObject();
+    } else {
+      return ctx.getBodyAsJson();
+    }
   }
 
   private boolean isValidRegistrationRequest(JsonObject json) {
@@ -128,6 +140,51 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     } else {
       fail500(ctx, err);
     }
+  }
+
+  private void updateUser(RoutingContext ctx) {
+    String username = ctx.pathParam("username");
+    JsonObject body = jsonBody(ctx);
+
+    JsonObject query = new JsonObject()
+      .put("username", username);
+
+    JsonObject updates = new JsonObject();
+    if (body.containsKey("deviceId")) {
+      updates.put("deviceId", body.getString("deviceId"));
+    }
+    if (body.containsKey("city")) {
+      updates.put("city", body.getString("city"));
+    }
+    if (body.containsKey("makePublic")) {
+      updates.put("makePublic", body.getBoolean("makePublic"));
+    }
+
+    if (updates.isEmpty()) {
+      ctx.response()
+        .setStatusCode(200)
+        .end();
+      return;
+    }
+    updates = new JsonObject()
+      .put("$set", updates);
+
+    mongoClient
+      .rxFindOneAndUpdate("user", query, updates)
+      .ignoreElement()
+      .subscribe(
+        () -> completeUpdateRequest(ctx),
+        err -> handleUpdateError(ctx, err));
+  }
+
+  private void completeUpdateRequest(RoutingContext ctx) {
+    ctx.response()
+      .setStatusCode(200)
+      .end();
+  }
+
+  private void handleUpdateError(RoutingContext ctx, Throwable err) {
+    fail500(ctx, err);
   }
 
   private void fail500(RoutingContext ctx, Throwable err) {

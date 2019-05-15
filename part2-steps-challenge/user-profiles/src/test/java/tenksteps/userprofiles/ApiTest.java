@@ -7,7 +7,6 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
-import io.restassured.specification.ResponseSpecification;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.IndexOptions;
 import io.vertx.ext.mongo.MongoClientDeleteResult;
@@ -15,21 +14,16 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.mongo.MongoClient;
-import org.assertj.core.api.Assertions;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.Arrays;
-
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.with;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 
 @ExtendWith(VertxExtension.class)
 class ApiTest {
@@ -181,5 +175,48 @@ class ApiTest {
       .get("/foo-bar-baz")
       .then()
       .statusCode(404);
+  }
+
+  @Test
+  void update() {
+    JsonObject original = basicUser();
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(original.encode())
+      .post("/register");
+
+    JsonObject updated = basicUser();
+    updated
+      .put("deviceId", "vertx-in-action-123")
+      .put("city", "Nevers")
+      .put("makePublic", false)
+      .put("username", "Bean");
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .body(updated.encode())
+      .put("/" + original.getString("username"))
+      .then()
+      .statusCode(200);
+
+    JsonPath jsonPath = given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .when()
+      .get("/" + original.getString("username"))
+      .then()
+      .assertThat()
+      .statusCode(200)
+      .extract()
+      .jsonPath();
+
+    assertThat(jsonPath.getString("username")).isEqualTo(original.getString("username"));
+    assertThat(jsonPath.getString("deviceId")).isEqualTo(updated.getString("deviceId"));
+    assertThat(jsonPath.getString("city")).isEqualTo(updated.getString("city"));
+    assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(updated.getBoolean("makePublic"));
   }
 }
