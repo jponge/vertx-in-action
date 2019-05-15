@@ -71,7 +71,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
         return mongoClient.rxFindOneAndUpdate("user", query, extraInfo);
       })
       .subscribe(
-        json -> completeRegistration(ctx, json),
+        ok -> completeRegistration(ctx),
         err -> handleRegistrationError(ctx, err));
   }
 
@@ -83,10 +83,8 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       json.containsKey("makePublic");
   }
 
-  private void completeRegistration(RoutingContext ctx, JsonObject json) {
-    ctx.response()
-      .putHeader("Content-Type", "application/json")
-      .end();
+  private void completeRegistration(RoutingContext ctx) {
+    ctx.response().end();
   }
 
   private void handleRegistrationError(RoutingContext ctx, Throwable err) {
