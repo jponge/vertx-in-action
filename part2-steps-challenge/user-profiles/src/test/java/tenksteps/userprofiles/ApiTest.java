@@ -286,4 +286,42 @@ class ApiTest {
     assertThat(jsonPath.getString("city")).isEqualTo(updated.getString("city"));
     assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(updated.getBoolean("makePublic"));
   }
+
+  @Test
+  void authenticate() {
+    JsonObject user = basicUser();
+
+    JsonObject goodAuthRequest = new JsonObject()
+      .put("username", user.getString("username"))
+      .put("password", user.getString("password"));
+
+    JsonObject badAuthRequest = new JsonObject()
+      .put("username", "Bean")
+      .put("password", "abc");
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .post("/register");
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .body(goodAuthRequest.encode())
+      .post("/authenticate")
+      .then()
+      .assertThat()
+      .statusCode(200);
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .body(badAuthRequest.encode())
+      .post("/authenticate")
+      .then()
+      .assertThat()
+      .statusCode(401);
+  }
 }

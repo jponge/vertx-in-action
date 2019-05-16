@@ -2,6 +2,7 @@ package tenksteps.userprofiles;
 
 import io.reactivex.Completable;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.mongo.AuthenticationException;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.auth.mongo.MongoAuth;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.NoSuchElementException;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyList;
@@ -48,6 +48,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .handler(this::register);
     router.get("/:username").handler(this::fetchUser);
     router.put("/:username").handler(this::updateUser);
+    router.post("/authenticate").handler(this::authenticate);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -184,18 +185,31 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .rxFindOneAndUpdate("user", query, updates)
       .ignoreElement()
       .subscribe(
-        () -> completeUpdateRequest(ctx),
+        () -> completeEmptySuccess(ctx),
         err -> handleUpdateError(ctx, err));
   }
 
-  private void completeUpdateRequest(RoutingContext ctx) {
-    ctx.response()
-      .setStatusCode(200)
-      .end();
+  private void completeEmptySuccess(RoutingContext ctx) {
+    ctx.response().setStatusCode(200).end();
   }
 
   private void handleUpdateError(RoutingContext ctx, Throwable err) {
     fail500(ctx, err);
+  }
+
+  private void authenticate(RoutingContext ctx) {
+    authProvider.rxAuthenticate(jsonBody(ctx))
+      .subscribe(
+        user -> completeEmptySuccess(ctx),
+        err -> handleAuthenticationError(ctx, err));
+  }
+
+  private void handleAuthenticationError(RoutingContext ctx, Throwable err) {
+    if (err instanceof AuthenticationException) {
+      ctx.response().setStatusCode(401).end();
+    } else {
+      fail500(ctx, err);
+    }
   }
 
   private void fail500(RoutingContext ctx, Throwable err) {
@@ -204,6 +218,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   public static void main(String[] args) {
+    System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     Vertx.vertx()
       .rxDeployVerticle(new UserProfileApiVerticle())
       .subscribe(
