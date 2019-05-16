@@ -14,10 +14,7 @@ import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.mongo.MongoClient;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import static io.restassured.RestAssured.given;
@@ -26,6 +23,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
+@DisplayName("User profile API integration tests")
 class ApiTest {
 
   private static RequestSpecification requestSpecification;
@@ -82,6 +80,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Register a user")
   void register() {
     String response = given()
       .spec(requestSpecification)
@@ -99,6 +98,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Failing to register with an existing user name")
   void registerExistingUser() {
     given()
       .spec(requestSpecification)
@@ -124,6 +124,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Failing to register a user with an already existing device id")
   void registerExistingDeviceId() {
     given()
       .spec(requestSpecification)
@@ -152,6 +153,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Failing to register with missing fields")
   void registerWIthMissingFields() {
     given()
       .spec(requestSpecification)
@@ -166,6 +168,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Failing to register with incorrect field data")
   void registerWithWrongFields() {
     JsonObject user = basicUser().put("username", "a b c  ");
     given()
@@ -205,6 +208,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Register a user then fetch it")
   void registerThenFetch() {
     JsonObject user = basicUser();
 
@@ -233,6 +237,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Fetching an unknown user")
   void fetchUnknownUser() {
     given()
       .spec(requestSpecification)
@@ -244,6 +249,7 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Register then update a user data")
   void update() {
     JsonObject original = basicUser();
 
@@ -288,16 +294,12 @@ class ApiTest {
   }
 
   @Test
+  @DisplayName("Authenticate an existing user")
   void authenticate() {
     JsonObject user = basicUser();
-
-    JsonObject goodAuthRequest = new JsonObject()
+    JsonObject request = new JsonObject()
       .put("username", user.getString("username"))
       .put("password", user.getString("password"));
-
-    JsonObject badAuthRequest = new JsonObject()
-      .put("username", "Bean")
-      .put("password", "abc");
 
     with()
       .spec(requestSpecification)
@@ -309,16 +311,24 @@ class ApiTest {
     with()
       .spec(requestSpecification)
       .contentType(ContentType.JSON)
-      .body(goodAuthRequest.encode())
+      .body(request.encode())
       .post("/authenticate")
       .then()
       .assertThat()
       .statusCode(200);
+  }
+
+  @Test
+  @DisplayName("Failing at authenticating an unknown user")
+  void authenticateMissingUser() {
+    JsonObject request = new JsonObject()
+      .put("username", "Bean")
+      .put("password", "abc");
 
     with()
       .spec(requestSpecification)
       .contentType(ContentType.JSON)
-      .body(badAuthRequest.encode())
+      .body(request.encode())
       .post("/authenticate")
       .then()
       .assertThat()

@@ -1,6 +1,7 @@
 plugins {
   id("com.github.ben-manes.versions") version "0.21.0"
   id("com.github.johnrengelman.shadow") version "5.0.0" apply false
+  id("com.adarshr.test-logger") version "1.6.0" apply false
 }
 
 subprojects {
@@ -21,6 +22,7 @@ subprojects {
   apply(plugin = "java")
   apply(plugin = "application")
   apply(plugin = "com.github.johnrengelman.shadow")
+  apply(plugin = "com.adarshr.test-logger")
 
   tasks.withType<JavaCompile> {
     sourceCompatibility = "1.8"
