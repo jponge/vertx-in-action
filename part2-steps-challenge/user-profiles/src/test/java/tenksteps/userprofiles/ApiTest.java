@@ -166,6 +166,45 @@ class ApiTest {
   }
 
   @Test
+  void registerWithWrongFields() {
+    JsonObject user = basicUser().put("username", "a b c  ");
+    given()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .when()
+      .post("/register")
+      .then()
+      .assertThat()
+      .statusCode(400);
+
+    user = basicUser().put("deviceId", "@123");
+    given()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .when()
+      .post("/register")
+      .then()
+      .assertThat()
+      .statusCode(400);
+
+    user = basicUser().put("password", "    ");
+    given()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .when()
+      .post("/register")
+      .then()
+      .assertThat()
+      .statusCode(400);
+  }
+
+  @Test
   void registerThenFetch() {
     JsonObject user = basicUser();
 

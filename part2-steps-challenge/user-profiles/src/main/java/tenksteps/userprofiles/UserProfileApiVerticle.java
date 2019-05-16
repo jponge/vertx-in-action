@@ -13,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Collections.emptyList;
 
@@ -41,7 +43,9 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     BodyHandler bodyHandler = BodyHandler.create();
     router.post().handler(bodyHandler);
     router.put().handler(bodyHandler);
-    router.post("/register").handler(this::register);
+    router.post("/register")
+      .handler(this::validateRegistration)
+      .handler(this::register);
     router.get("/:username").handler(this::fetchUser);
     router.put("/:username").handler(this::updateUser);
 
@@ -51,14 +55,42 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .ignoreElement();
   }
 
+  private JsonObject jsonBody(RoutingContext ctx) {
+    if (ctx.getBody().length() == 0) {
+      return new JsonObject();
+    } else {
+      return ctx.getBodyAsJson();
+    }
+  }
+
+  private void validateRegistration(RoutingContext ctx) {
+    JsonObject body = jsonBody(ctx);
+    if (anyRegistrationFieldIsMissing(body) || anyRegistrationFieldIsWrong(body)) {
+      ctx.fail(400);
+    } else {
+      ctx.next();
+    }
+  }
+
+  private boolean anyRegistrationFieldIsMissing(JsonObject body) {
+    return !(body.containsKey("username") &&
+      body.containsKey("password") &&
+      body.containsKey("city") &&
+      body.containsKey("deviceId") &&
+      body.containsKey("makePublic"));
+  }
+
+  private final Pattern validUsername = Pattern.compile("\\w+");
+  private final Pattern validDeviceId = Pattern.compile("\\w[\\w+|-]*");
+
+  private boolean anyRegistrationFieldIsWrong(JsonObject body) {
+    return !validUsername.matcher(body.getString("username")).matches() ||
+      body.getString("password").trim().isEmpty() ||
+      !validDeviceId.matcher(body.getString("deviceId")).matches();
+  }
+
   private void register(RoutingContext ctx) {
     JsonObject body = jsonBody(ctx);
-
-    if (!isValidRegistrationRequest(body)) {
-      ctx.fail(400);
-      return;
-    }
-
     String username = body.getString("username");
     String password = body.getString("password");
 
@@ -77,22 +109,6 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       .subscribe(
         ok -> completeRegistration(ctx),
         err -> handleRegistrationError(ctx, err));
-  }
-
-  private JsonObject jsonBody(RoutingContext ctx) {
-    if (ctx.getBody().length() == 0) {
-      return new JsonObject();
-    } else {
-      return ctx.getBodyAsJson();
-    }
-  }
-
-  private boolean isValidRegistrationRequest(JsonObject json) {
-    return json.containsKey("username") &&
-      json.containsKey("password") &&
-      json.containsKey("city") &&
-      json.containsKey("deviceId") &&
-      json.containsKey("makePublic");
   }
 
   private void completeRegistration(RoutingContext ctx) {
@@ -146,9 +162,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     String username = ctx.pathParam("username");
     JsonObject body = jsonBody(ctx);
 
-    JsonObject query = new JsonObject()
-      .put("username", username);
-
+    JsonObject query = new JsonObject().put("username", username);
     JsonObject updates = new JsonObject();
     if (body.containsKey("city")) {
       updates.put("city", body.getString("city"));
