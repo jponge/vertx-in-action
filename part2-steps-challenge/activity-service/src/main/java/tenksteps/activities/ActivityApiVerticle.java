@@ -1,12 +1,10 @@
 package tenksteps.activities;
 
-import io.reactiverse.pgclient.PgPoolOptions;
 import io.reactiverse.reactivex.pgclient.PgClient;
 import io.reactiverse.reactivex.pgclient.PgConnection;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.vertx.reactivex.core.AbstractVerticle;
-import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.core.http.HttpServer;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
@@ -21,8 +19,6 @@ public class ActivityApiVerticle extends AbstractVerticle {
   private static final Logger logger = LoggerFactory.getLogger(ActivityApiVerticle.class);
 
   private PgClient pgClient;
-  private KafkaConsumer<String, JsonObject> eventConsumer;
-  private KafkaProducer<String, JsonObject> updateProducer;
 
   @Override
   public Completable rxStart() {
@@ -32,22 +28,15 @@ public class ActivityApiVerticle extends AbstractVerticle {
       .requestHandler(router)
       .rxListen(8080);
 
-    eventConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("activity-service"));
-    updateProducer = KafkaProducer.create(vertx, KafkaConfig.producer());
+    Single<PgConnection> dbConnect = PgClient.rxConnect(vertx, PgConfig.pgOpts());
 
-    Single<PgConnection> dbConnect = PgClient.rxConnect(vertx, pgOpts());
-
-    return Single.zip(serverStart, dbConnect, (httpServer, dbClient) -> {
-      pgClient = dbClient;
-      return pgClient;
-    }).ignoreElement();
+    return Single.zip(serverStart, dbConnect, (http, db) -> setPgClient(db))
+      .ignoreElement();
   }
 
-  private PgPoolOptions pgOpts() {
-    return new PgPoolOptions()
-      .setHost("localhost")
-      .setDatabase("postgres")
-      .setUser("postgres")
-      .setPassword("vertx-in-action");
+  private PgClient setPgClient(PgConnection dbClient) {
+    pgClient = dbClient;
+    return pgClient;
   }
+
 }
