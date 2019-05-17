@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
 @DisplayName("User profile API integration tests")
-class ApiTest {
+class UserApiTest {
 
   private static RequestSpecification requestSpecification;
 
