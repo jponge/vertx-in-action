@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class ActivityApiVerticle extends AbstractVerticle {
 
-  private static final int HTTP_PORT = 3001;
+  static final int HTTP_PORT = 3001;
   private static final Logger logger = LoggerFactory.getLogger(ActivityApiVerticle.class);
 
   private PgClient pgClient;
@@ -49,14 +49,5 @@ public class ActivityApiVerticle extends AbstractVerticle {
       .setDatabase("postgres")
       .setUser("postgres")
       .setPassword("vertx-in-action");
-  }
-
-  public static void main(String[] args) {
-    System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
-    Vertx.vertx()
-      .rxDeployVerticle(new ActivityApiVerticle())
-      .subscribe(
-        ok -> logger.info("Server started on port {}", HTTP_PORT),
-        err -> logger.error("Woops", err));
   }
 }

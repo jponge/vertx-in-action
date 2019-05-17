@@ -8,7 +8,7 @@
 
   <logger name="io.netty" level="warn"/>
   <logger name="io.vertx" level="info"/>
-  <logger name="org.mongodb" level="info"/>
+  <logger name="org.apache.kafka" level="info"/>
 
   <root level="debug">
     <appender-ref ref="STDOUT"/>

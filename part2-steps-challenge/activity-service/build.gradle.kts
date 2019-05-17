@@ -10,7 +10,10 @@ dependencies {
   implementation("io.vertx:vertx-web:$vertxVersion")
   implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
-  implementation("io.vertx:vertx-kafka-client:$vertxVersion")
+  implementation("io.vertx:vertx-kafka-client:$vertxVersion") {
+    exclude("org.slf4j")
+    exclude("log4j")
+  }
   implementation("io.reactiverse:reactive-pg-client:$pgClientVersion")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
@@ -22,7 +25,7 @@ dependencies {
 }
 
 application {
-  mainClassName = "tenksteps.activities.ActivityApiVerticle"
+  mainClassName = "tenksteps.activities.Main"
 }
 
 tasks.test {

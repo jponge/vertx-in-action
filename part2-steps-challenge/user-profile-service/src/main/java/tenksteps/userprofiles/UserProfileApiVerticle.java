@@ -223,7 +223,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     Vertx.vertx()
       .rxDeployVerticle(new UserProfileApiVerticle())
       .subscribe(
-        ok -> logger.info("Server started on port {}", HTTP_PORT),
+        ok -> logger.info("HTTP server started on port {}", HTTP_PORT),
         err -> logger.error("Woops", err));
   }
 }
