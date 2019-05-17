@@ -20,6 +20,7 @@ import static java.util.Collections.emptyList;
 
 public class UserProfileApiVerticle extends AbstractVerticle {
 
+  private static final int HTTP_PORT = 3000;
   private static final Logger logger = LoggerFactory.getLogger(UserProfileApiVerticle.class);
 
   private MongoAuth authProvider;
@@ -52,7 +53,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
 
     return vertx.createHttpServer()
       .requestHandler(router)
-      .rxListen(3000)
+      .rxListen(HTTP_PORT)
       .ignoreElement();
   }
 
@@ -222,7 +223,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     Vertx.vertx()
       .rxDeployVerticle(new UserProfileApiVerticle())
       .subscribe(
-        ok -> logger.info("Server started on port 3000"),
+        ok -> logger.info("Server started on port {}", HTTP_PORT),
         err -> logger.error("Woops", err));
   }
 }
