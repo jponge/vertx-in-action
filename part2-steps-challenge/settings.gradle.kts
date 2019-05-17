@@ -1,3 +1,3 @@
 rootProject.name = "part2-steps-challenge"
 
-include("user-profiles")
+include("user-profile-service")
