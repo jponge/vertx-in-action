@@ -33,6 +33,7 @@ class EventProcessingTest {
     PgClient.rxConnect(vertx, PgConfig.pgOpts())
       .flatMap(pgConnection -> pgConnection.rxQuery("DELETE FROM StepEvent"))
       .flatMapCompletable(rs -> adminClient.rxDeleteTopics(Arrays.asList("incoming.steps", "daily.step.updates")))
+      .onErrorComplete()
       .subscribe(
         testContext::completeNow,
         testContext::failNow);
