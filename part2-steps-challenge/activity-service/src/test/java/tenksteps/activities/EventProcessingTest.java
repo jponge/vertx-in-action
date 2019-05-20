@@ -26,8 +26,8 @@ class EventProcessingTest {
   private KafkaProducer<String, JsonObject> producer;
 
   @BeforeEach
-  void resetPg(Vertx vertx, VertxTestContext testContext) {
-    consumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetLatest("activity-service-test"));
+  void resetPgAndKafka(Vertx vertx, VertxTestContext testContext) {
+    consumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetEarliest("activity-service-test-" + System.currentTimeMillis()));
     producer = KafkaProducer.create(vertx, KafkaConfig.producer());
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, KafkaConfig.producer());
     PgClient.rxConnect(vertx, PgConfig.pgOpts())
@@ -42,6 +42,19 @@ class EventProcessingTest {
   @Test
   @DisplayName("Send events from the same device, and observe that a correct daily steps count event is being produced")
   void observeDailyStepsCountEvent(Vertx vertx, VertxTestContext testContext) {
+    consumer.subscribe("daily.step.updates")
+      .toFlowable()
+      .skip(1)
+      .subscribe(record -> {
+        JsonObject json = record.value();
+        testContext.verify(() -> {
+          assertThat(json.getString("deviceId")).isEqualTo("123");
+          assertThat(json.containsKey("timestamp")).isTrue();
+          assertThat(json.getInteger("stepsCount")).isEqualTo(250);
+        });
+        testContext.completeNow();
+      }, testContext::failNow);
+
     vertx
       .rxDeployVerticle(new EventsVerticle())
       .flatMap(id -> {
@@ -59,19 +72,6 @@ class EventProcessingTest {
         return producer.rxWrite(KafkaProducerRecord.create("incoming.steps", "123", steps));
       })
       .subscribe(ok -> {
-      }, testContext::failNow);
-
-    consumer.subscribe("daily.step.updates")
-      .toFlowable()
-      .skip(1)
-      .subscribe(record -> {
-        JsonObject json = record.value();
-        testContext.verify(() -> {
-          assertThat(json.getString("deviceId")).isEqualTo("123");
-          assertThat(json.containsKey("timestamp")).isTrue();
-          assertThat(json.getInteger("stepsCount")).isEqualTo(250);
-        });
-        testContext.completeNow();
       }, testContext::failNow);
   }
 }
