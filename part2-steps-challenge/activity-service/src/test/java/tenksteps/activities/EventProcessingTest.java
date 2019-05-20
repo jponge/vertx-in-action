@@ -39,7 +39,8 @@ class EventProcessingTest {
   }
 
   @Test
-  void plop(Vertx vertx, VertxTestContext testContext) {
+  @DisplayName("Send events from the same device, and observe that a correct daily steps count event is being produced")
+  void observeDailyStepsCountEvent(Vertx vertx, VertxTestContext testContext) {
     vertx
       .rxDeployVerticle(new EventsVerticle())
       .flatMap(id -> {
