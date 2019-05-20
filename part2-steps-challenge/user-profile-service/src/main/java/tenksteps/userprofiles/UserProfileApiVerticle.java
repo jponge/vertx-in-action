@@ -50,6 +50,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     router.get("/:username").handler(this::fetchUser);
     router.put("/:username").handler(this::updateUser);
     router.post("/authenticate").handler(this::authenticate);
+    router.get("/owns/:deviceId").handler(this::whoOwns);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -211,6 +212,25 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     } else {
       fail500(ctx, err);
     }
+  }
+
+  private void whoOwns(RoutingContext ctx) {
+    String deviceId = ctx.pathParam("deviceId");
+
+    JsonObject query = new JsonObject()
+      .put("deviceId", deviceId);
+
+    JsonObject fields = new JsonObject()
+      .put("_id", 0)
+      .put("username", 1)
+      .put("deviceId", 1);
+
+    mongoClient
+      .rxFindOne("user", query, fields)
+      .toSingle()
+      .subscribe(
+        json -> completeFetchRequest(ctx, json),
+        err -> handleFetchError(ctx, err));
   }
 
   private void fail500(RoutingContext ctx, Throwable err) {

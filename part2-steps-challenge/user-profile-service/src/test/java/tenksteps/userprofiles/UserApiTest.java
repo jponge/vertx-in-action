@@ -234,6 +234,8 @@ class UserApiTest {
     assertThat(jsonPath.getString("deviceId")).isEqualTo(user.getString("deviceId"));
     assertThat(jsonPath.getString("city")).isEqualTo(user.getString("city"));
     assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(user.getBoolean("makePublic"));
+    assertThat(jsonPath.getString("_id")).isNull();
+    assertThat(jsonPath.getString("password")).isNull();
   }
 
   @Test
@@ -333,5 +335,42 @@ class UserApiTest {
       .then()
       .assertThat()
       .statusCode(401);
+  }
+
+  @Test
+  @DisplayName("Find who owns a device")
+  void whoHas() {
+    JsonObject user = basicUser();
+
+    with()
+      .spec(requestSpecification)
+      .contentType(ContentType.JSON)
+      .accept(ContentType.JSON)
+      .body(user.encode())
+      .post("/register");
+
+    JsonPath jsonPath = given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .when()
+      .get("/owns/" + user.getString("deviceId"))
+      .then()
+      .assertThat()
+      .statusCode(200)
+      .extract()
+      .jsonPath();
+
+    assertThat(jsonPath.getString("username")).isEqualTo(user.getString("username"));
+    assertThat(jsonPath.getString("deviceId")).isEqualTo(user.getString("deviceId"));
+    assertThat(jsonPath.getString("city")).isNull();
+
+    given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .when()
+      .get("/owns/404")
+      .then()
+      .assertThat()
+      .statusCode(404);
   }
 }
