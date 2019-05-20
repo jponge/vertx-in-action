@@ -7,9 +7,6 @@ import io.reactivex.Single;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.http.HttpServer;
 import io.vertx.reactivex.ext.web.Router;
-import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
-import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
-import kafka.utils.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
