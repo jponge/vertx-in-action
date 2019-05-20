@@ -15,6 +15,9 @@ import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static tenksteps.activities.SqlQueries.insertStepEvent;
+import static tenksteps.activities.SqlQueries.stepsCountForToday;
+
 public class EventsVerticle extends AbstractVerticle {
 
   private static final Logger logger = LoggerFactory.getLogger(EventsVerticle.class);
@@ -37,10 +40,6 @@ public class EventsVerticle extends AbstractVerticle {
     return pgClient;
   }
 
-  // $1 = device_id, $2 = device_sync, $3 = steps_count
-  private static final String Q_INSERT =
-    "INSERT INTO StepEvent VALUES($1, $2, current_timestamp, $3)";
-
   private Completable setupConsumer() {
     eventConsumer
       .subscribe("incoming.steps")
@@ -62,7 +61,7 @@ public class EventsVerticle extends AbstractVerticle {
       data.getInteger("stepsCount"));
 
     return pgClient
-      .rxPreparedQuery(Q_INSERT, values)
+      .rxPreparedQuery(insertStepEvent(), values)
       .map(rs -> record)
       .onErrorReturn(err -> {
         if (duplicateKeyInsert(err)) {
@@ -78,16 +77,10 @@ public class EventsVerticle extends AbstractVerticle {
     return (err instanceof PgException) && "23505".equals(((PgException) err).getCode());
   }
 
-  // TODO: move queries to factory methods
-  private static final String Q_TODAY_COUNT =
-    "SELECT current_timestamp, coalesce(sum(steps_count), 0) FROM StepEvent WHERE " +
-      "(device_id = $1) AND" +
-      "(date_trunc('day', sync_timestamp) = date_trunc('day', current_timestamp))";
-
   private Flowable<KafkaConsumerRecord<String, JsonObject>> generateActivityUpdate(KafkaConsumerRecord<String, JsonObject> record) {
     String deviceId = record.value().getString("deviceId");
     return pgClient
-      .rxPreparedQuery(Q_TODAY_COUNT, Tuple.of(deviceId))
+      .rxPreparedQuery(stepsCountForToday(), Tuple.of(deviceId))
       .map(rs -> rs.iterator().next())
       .map(row -> new JsonObject()
         .put("deviceId", deviceId)
