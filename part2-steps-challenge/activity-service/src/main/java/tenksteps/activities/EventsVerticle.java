@@ -8,12 +8,15 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumerRecord;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 import static tenksteps.activities.SqlQueries.insertStepEvent;
 import static tenksteps.activities.SqlQueries.stepsCountForToday;
@@ -47,9 +50,15 @@ public class EventsVerticle extends AbstractVerticle {
       .flatMap(this::insertRecord)
       .flatMap(this::generateActivityUpdate)
       .doOnError(err -> logger.error("Woops", err))
-      .retry() // TODO: add re-subscription delay
+      .retryWhen(this::exponentialBackoff)
       .subscribe();
     return Completable.complete();
+  }
+
+  private Flowable<Long> exponentialBackoff(Flowable<Throwable> throwableFlowable) {
+    return throwableFlowable
+      .zipWith(Flowable.range(1, 8), (t, i) -> (int) Math.pow(2.0d, i))
+      .flatMap(d -> Flowable.timer(d, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
   }
 
   private Flowable<KafkaConsumerRecord<String, JsonObject>> insertRecord(KafkaConsumerRecord<String, JsonObject> record) {
