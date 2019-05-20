@@ -50,15 +50,14 @@ public class EventsVerticle extends AbstractVerticle {
       .flatMap(this::insertRecord)
       .flatMap(this::generateActivityUpdate)
       .doOnError(err -> logger.error("Woops", err))
-      .retryWhen(this::exponentialBackoff)
+      .retryWhen(this::retryLater)
       .subscribe();
     return Completable.complete();
   }
 
-  private Flowable<Long> exponentialBackoff(Flowable<Throwable> throwableFlowable) {
-    return throwableFlowable
-      .zipWith(Flowable.range(1, 8), (t, i) -> (int) Math.pow(2.0d, i))
-      .flatMap(d -> Flowable.timer(d, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  private Flowable<Long> retryLater(Flowable<Throwable> errs) {
+    return errs
+      .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
   }
 
   private Flowable<KafkaConsumerRecord<String, JsonObject>> insertRecord(KafkaConsumerRecord<String, JsonObject> record) {
