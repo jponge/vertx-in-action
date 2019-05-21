@@ -11,4 +11,21 @@ interface SqlQueries {
       "(device_id = $1) AND" +
       "(date_trunc('day', sync_timestamp) = date_trunc('day', current_timestamp))";
   }
+
+  static String totalStepsCount() {
+    return "SELECT sum(steps_count) FROM StepEvent WHERE" +
+      "(device_id = $1)";
+  }
+
+  static String monthlyStepsCount() {
+    return "SELECT sum(steps_count) FROM StepEvent WHERE" +
+      "(device_id = $1) AND" +
+      "(date_trunc('month', sync_timestamp) = $2::timestamp)";
+  }
+
+  static String dailyStepsCount() {
+    return "SELECT sum(steps_count) FROM StepEvent WHERE" +
+      "(device_id = $1) AND" +
+      "(date_trunc('day', sync_timestamp) = $2::timestamp)";
+  }
 }
