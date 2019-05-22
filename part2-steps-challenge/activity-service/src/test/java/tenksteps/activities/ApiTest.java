@@ -41,7 +41,7 @@ public class ApiTest {
 
   private PgClient pgClient;
 
-  @BeforeEach
+  @BeforeEach // TODO close pgClient (needs next version)
   void prepareDb(Vertx vertx, VertxTestContext testContext) {
     String insertQuery = "INSERT INTO StepEvent VALUES($1, $2, $3::timestamp, $4)";
     List<Tuple> data = Arrays.asList(
