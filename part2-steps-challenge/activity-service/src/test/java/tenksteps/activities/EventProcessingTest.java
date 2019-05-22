@@ -33,7 +33,7 @@ class EventProcessingTest {
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, KafkaConfig.producer());
     PgClient.rxConnect(vertx, PgConfig.pgOpts())
       .doOnSuccess(pgConnection -> this.pgClient = pgConnection)
-      .flatMap(pgConnection -> pgConnection.rxQuery("DELETE FROM StepEvent"))
+      .flatMap(pgConnection -> pgConnection.rxQuery("DELETE FROM stepevent"))
       .flatMapCompletable(rs -> adminClient.rxDeleteTopics(Arrays.asList("incoming.steps", "daily.step.updates")))
       .onErrorComplete()
       .subscribe(

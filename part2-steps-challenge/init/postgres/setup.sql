@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS StepEvent
+CREATE TABLE IF NOT EXISTS stepevent
 (
   device_id VARCHAR,
   device_sync BIGINT,
