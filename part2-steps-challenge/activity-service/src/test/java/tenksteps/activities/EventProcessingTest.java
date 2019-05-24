@@ -64,14 +64,14 @@ class EventProcessingTest {
           .put("deviceId", "123")
           .put("deviceSync", 1L)
           .put("stepsCount", 200);
-        return producer.rxWrite(KafkaProducerRecord.create("incoming.steps", "123", steps));
+        return producer.rxSend(KafkaProducerRecord.create("incoming.steps", "123", steps));
       })
       .flatMap(id -> {
         JsonObject steps = new JsonObject()
           .put("deviceId", "123")
           .put("deviceSync", 2L)
           .put("stepsCount", 50);
-        return producer.rxWrite(KafkaProducerRecord.create("incoming.steps", "123", steps));
+        return producer.rxSend(KafkaProducerRecord.create("incoming.steps", "123", steps));
       })
       .subscribe(ok -> {
       }, testContext::failNow);

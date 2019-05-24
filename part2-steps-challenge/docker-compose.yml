@@ -45,3 +45,8 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  artemis:
+    image: vromero/activemq-artemis:2-alpine-latest
+    ports:
+      - "5672:5672"

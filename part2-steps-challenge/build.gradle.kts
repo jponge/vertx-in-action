@@ -13,7 +13,7 @@ subprojects {
     }
   }
 
-  extra["vertxVersion"] = "3.7.0"
+  extra["vertxVersion"] = "3.7.1"
   extra["junit5Version"] = "5.4.2"
   extra["restAssuredVersion"] = "4.0.0"
   extra["logbackClassicVersion"] = "1.2.3"

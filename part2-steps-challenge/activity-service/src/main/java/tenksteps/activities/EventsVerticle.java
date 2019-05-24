@@ -94,7 +94,7 @@ public class EventsVerticle extends AbstractVerticle {
         .put("deviceId", deviceId)
         .put("timestamp", row.getTemporal(0).toString())
         .put("stepsCount", row.getLong(1)))
-      .flatMap(json -> updateProducer.rxWrite(KafkaProducerRecord.create("daily.step.updates", deviceId, json)))
+      .flatMap(json -> updateProducer.rxSend(KafkaProducerRecord.create("daily.step.updates", deviceId, json)))
       .map(rs -> record)
       .toFlowable();
   }
