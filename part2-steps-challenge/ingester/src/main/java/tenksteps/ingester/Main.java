@@ -3,6 +3,7 @@ package tenksteps.ingester;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.vertx.amqp.AmqpClientOptions;
+import io.vertx.amqp.AmqpReceiverOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.amqp.AmqpClient;
 import io.vertx.reactivex.amqp.AmqpMessage;
@@ -12,6 +13,7 @@ import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
+import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,9 +36,12 @@ public class Main extends AbstractVerticle {
 
     updateProducer = KafkaProducer.create(vertx, kafkaConfig());
 
+    AmqpReceiverOptions receiverOptions = new AmqpReceiverOptions()
+      .setAutoAcknowledgement(false);
+
     AmqpClient.create(vertx, amqpOptions)
       .rxConnect()
-      .flatMap(conn -> conn.rxCreateReceiver("step-events"))
+      .flatMap(conn -> conn.rxCreateReceiver("step-events", receiverOptions))
       .toFlowable()
       .flatMap(AmqpReceiver::toFlowable)
       .doOnError(this::handleAmqpError)
@@ -75,7 +80,25 @@ public class Main extends AbstractVerticle {
     logger.error("Woops AMQP", err);
   }
 
-  private void handleAmqpMessage(AmqpMessage amqpMessage) {
+  private void handleAmqpMessage(AmqpMessage message) {
+    JsonObject payload = message.bodyAsJsonObject();
+    if (!payload.containsKey("deviceId") || !payload.containsKey("deviceSync") || !payload.containsKey("stepsCount")) {
+      logger.error("Invalid AMQP message: {}", payload.encode());
+      return;
+    }
+
+    String deviceId = payload.getString("deviceId");
+    JsonObject recordData = new JsonObject()
+      .put("deviceId", deviceId)
+      .put("deviceSync", payload.getLong("deviceSync"))
+      .put("stepsCount", payload.getInteger("stepsCount"));
+
+    KafkaProducerRecord<String, JsonObject> record = KafkaProducerRecord
+      .create("incoming.steps", deviceId, recordData);
+
+    updateProducer.rxSend(record).subscribe(
+      ok -> message.accepted(),
+      err -> message.rejected());
   }
 
   public static void main(String[] args) {
