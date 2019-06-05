@@ -13,6 +13,7 @@ import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumerRecord;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class EventsVerticle extends AbstractVerticle {
       .toFlowable()
       .flatMap(this::insertRecord)
       .flatMap(this::generateActivityUpdate)
+      .flatMap(this::commitKafkaConsumerOffset)
       .doOnError(err -> logger.error("Woops", err))
       .retryWhen(this::retryLater)
       .subscribe();
@@ -97,5 +99,9 @@ public class EventsVerticle extends AbstractVerticle {
       .flatMap(json -> updateProducer.rxSend(KafkaProducerRecord.create("daily.step.updates", deviceId, json)))
       .map(rs -> record)
       .toFlowable();
+  }
+
+  private Publisher<?> commitKafkaConsumerOffset(KafkaConsumerRecord<String, JsonObject> record) {
+    return eventConsumer.rxCommit().toFlowable();
   }
 }

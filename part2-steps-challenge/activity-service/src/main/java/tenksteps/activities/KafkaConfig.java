@@ -18,17 +18,13 @@ class KafkaConfig {
     return consumerOffsetEarliest(group, "earliest");
   }
 
-  static Map<String, String> consumerOffsetLatest(String group) {
-    return consumerOffsetEarliest(group, "latest");
-  }
-
   static Map<String, String> consumerOffsetEarliest(String group, String latest) {
     Map<String, String> config = new HashMap<>();
     config.put("bootstrap.servers", "localhost:9092");
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
     config.put("auto.offset.reset", latest);
-    config.put("enable.auto.commit", "true");
+    config.put("enable.auto.commit", "false");
     config.put("group.id", group);
     return config;
   }
