@@ -58,7 +58,7 @@ class UserApiTest {
   }
 
   private Single<MongoClientDeleteResult> dropAllUsers() {
-    return mongoClient.rxRemoveDocuments("user", new JsonObject());
+    return mongoClient.rxRemoveDocuments("user", new JsonObject()).toSingle();
   }
 
   @AfterEach
