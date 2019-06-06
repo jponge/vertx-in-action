@@ -1,6 +1,8 @@
 package tenksteps.userprofiles;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.mongo.AuthenticationException;
 import io.vertx.reactivex.core.AbstractVerticle;
@@ -105,13 +107,30 @@ public class UserProfileApiVerticle extends AbstractVerticle {
 
     authProvider
       .rxInsertUser(username, password, emptyList(), emptyList())
-      .flatMapMaybe(docId -> {
-        JsonObject query = new JsonObject().put("_id", docId);
-        return mongoClient.rxFindOneAndUpdate("user", query, extraInfo);
-      })
+      .flatMapMaybe(docId -> insertExtraInfo(extraInfo, docId))
+      .ignoreElement()
       .subscribe(
-        ok -> completeRegistration(ctx),
+        () -> completeRegistration(ctx),
         err -> handleRegistrationError(ctx, err));
+  }
+
+  private MaybeSource<? extends JsonObject> insertExtraInfo(JsonObject extraInfo, String docId) {
+    JsonObject query = new JsonObject().put("_id", docId);
+    return mongoClient
+      .rxFindOneAndUpdate("user", query, extraInfo)
+      .onErrorResumeNext(err -> {
+        return deleteIncompleteUser(query, err);
+      });
+  }
+
+  private MaybeSource<? extends JsonObject> deleteIncompleteUser(JsonObject query, Throwable err) {
+    if (isIndexViolated(err)) {
+      return mongoClient
+        .rxRemoveDocument("user", query)
+        .flatMap(del -> Maybe.error(err));
+    } else {
+      return Maybe.error(err);
+    }
   }
 
   private void completeRegistration(RoutingContext ctx) {
@@ -119,11 +138,16 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   private void handleRegistrationError(RoutingContext ctx, Throwable err) {
-    if (err.getMessage().contains("E11000")) {
+    if (isIndexViolated(err)) {
+      logger.error("Registration failure: {}", err.getMessage());
       ctx.fail(409);
     } else {
       fail500(ctx, err);
     }
+  }
+
+  private boolean isIndexViolated(Throwable err) {
+    return err.getMessage().contains("E11000");
   }
 
   private void fetchUser(RoutingContext ctx) {

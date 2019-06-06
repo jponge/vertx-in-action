@@ -125,7 +125,7 @@ class UserApiTest {
 
   @Test
   @DisplayName("Failing to register a user with an already existing device id")
-  void registerExistingDeviceId() {
+  void registerExistingDeviceId(VertxTestContext testContext) {
     given()
       .spec(requestSpecification)
       .contentType(ContentType.JSON)
@@ -150,6 +150,13 @@ class UserApiTest {
       .then()
       .assertThat()
       .statusCode(409);
+
+    mongoClient
+      .rxFindOne("user", new JsonObject().put("username", "Bean"), new JsonObject())
+      .subscribe(
+        found -> testContext.failNow(new IllegalStateException("Incomplete document still inserted: " + found.encode())),
+        testContext::failNow,
+        testContext::completeNow);
   }
 
   @Test
