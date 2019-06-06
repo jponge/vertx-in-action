@@ -12,6 +12,8 @@ import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.web.Router;
+import io.vertx.reactivex.ext.web.RoutingContext;
+import io.vertx.reactivex.ext.web.handler.BodyHandler;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
@@ -30,12 +32,9 @@ public class Main extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-    Router router = Router.router(vertx);
-
-    AmqpClientOptions amqpOptions = amqpConfig();
-
     updateProducer = KafkaProducer.create(vertx, kafkaConfig());
 
+    AmqpClientOptions amqpOptions = amqpConfig();
     AmqpReceiverOptions receiverOptions = new AmqpReceiverOptions()
       .setAutoAcknowledgement(false);
 
@@ -47,6 +46,10 @@ public class Main extends AbstractVerticle {
       .doOnError(this::handleAmqpError)
       .retryWhen(this::retryLater)
       .subscribe(this::handleAmqpMessage, this::handleAmqpError);
+
+    Router router = Router.router(vertx);
+    router.post().handler(BodyHandler.create());
+    router.post("/ingest").handler(this::httpIngest);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -82,23 +85,49 @@ public class Main extends AbstractVerticle {
 
   private void handleAmqpMessage(AmqpMessage message) {
     JsonObject payload = message.bodyAsJsonObject();
-    if (!payload.containsKey("deviceId") || !payload.containsKey("deviceSync") || !payload.containsKey("stepsCount")) {
-      logger.error("Invalid AMQP message: {}", payload.encode());
+    if (invalidIngestedJson(payload)) {
+      logger.error("Invalid AMQP JSON (discarded): {}", payload.encode());
+      message.accepted();
       return;
     }
 
-    String deviceId = payload.getString("deviceId");
-    JsonObject recordData = new JsonObject()
-      .put("deviceId", deviceId)
-      .put("deviceSync", payload.getLong("deviceSync"))
-      .put("stepsCount", payload.getInteger("stepsCount"));
-
-    KafkaProducerRecord<String, JsonObject> record = KafkaProducerRecord
-      .create("incoming.steps", deviceId, recordData);
-
+    KafkaProducerRecord<String, JsonObject> record = makeKafkaRecord(payload);
     updateProducer.rxSend(record).subscribe(
       ok -> message.accepted(),
-      err -> message.rejected());
+      err -> {
+        logger.error("AMQP ingestion failed", err);
+        message.rejected();
+      });
+  }
+
+  private void httpIngest(RoutingContext ctx) {
+    JsonObject payload = ctx.getBodyAsJson();
+    if (invalidIngestedJson(payload)) {
+      logger.error("Invalid HTTP JSON (discarded): {}", payload.encode());
+      ctx.fail(400);
+      return;
+    }
+
+    KafkaProducerRecord<String, JsonObject> record = makeKafkaRecord(payload);
+    updateProducer.rxSend(record).subscribe(
+      ok -> ctx.response().end(),
+      err -> {
+        logger.error("HTTP ingestion failed", err);
+        ctx.fail(500);
+      });
+  }
+
+  private boolean invalidIngestedJson(JsonObject payload) {
+    return !payload.containsKey("deviceId") || !payload.containsKey("deviceSync") || !payload.containsKey("stepsCount");
+  }
+
+  private KafkaProducerRecord<String, JsonObject> makeKafkaRecord(JsonObject payload) {
+    String deviceId = payload.getString("deviceId");
+    JsonObject recordData = new JsonObject()
+      .put("deviceId", payload.getString("deviceId"))
+      .put("deviceSync", payload.getLong("deviceSync"))
+      .put("stepsCount", payload.getInteger("stepsCount"));
+    return KafkaProducerRecord.create("incoming.steps", deviceId, recordData);
   }
 
   public static void main(String[] args) {

@@ -1,5 +1,11 @@
 package tenksteps.ingester;
 
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.RequestLoggingFilter;
+import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import io.vertx.amqp.AmqpClientOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
@@ -10,6 +16,7 @@ import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.kafka.admin.KafkaAdminClient;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,11 +27,23 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static io.restassured.RestAssured.given;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
 class IngesterTest {
+
+  private static RequestSpecification requestSpecification;
+
+  @BeforeAll
+  static void prepareSpec() {
+    requestSpecification = new RequestSpecBuilder()
+      .addFilters(asList(new ResponseLoggingFilter(), new RequestLoggingFilter()))
+      .setBaseUri("http://localhost:3002/")
+      .build();
+  }
 
   static Map<String, String> kafkaConfig() {
     Map<String, String> config = new HashMap<>();
@@ -105,6 +124,63 @@ class IngesterTest {
           sender.send(msg);
         },
         testContext::failNow);
+
+    kafkaConsumer.subscribe("incoming.steps")
+      .toFlowable()
+      .timeout(3, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
+      .subscribe(
+        record -> testContext.failNow(new IllegalStateException("We must not get a record")),
+        err -> {
+          if (err instanceof TimeoutException) {
+            testContext.completeNow();
+          } else {
+            testContext.failNow(err);
+          }
+        });
+  }
+
+  @Test
+  @DisplayName("Ingest a well-formed JSON data over HTTP")
+  void httpIngest(VertxTestContext testContext) {
+    JsonObject body = new JsonObject()
+      .put("deviceId", "456")
+      .put("deviceSync", 3L)
+      .put("stepsCount", 125);
+
+    given(requestSpecification)
+      .contentType(ContentType.JSON)
+      .body(body.encode())
+      .post("/ingest")
+      .then()
+      .assertThat()
+      .statusCode(200);
+
+    kafkaConsumer.subscribe("incoming.steps")
+      .toFlowable()
+      .subscribe(
+        record -> testContext.verify(() -> {
+          assertThat(record.key()).isEqualTo("456");
+          JsonObject json = record.value();
+          assertThat(json.getString("deviceId")).isEqualTo("456");
+          assertThat(json.getLong("deviceSync")).isEqualTo(3L);
+          assertThat(json.getInteger("stepsCount")).isEqualTo(125);
+          testContext.completeNow();
+        }),
+        testContext::failNow);
+  }
+
+  @Test
+  @DisplayName("Ingest a badly-formed JSON data over HTTP and observe no Kafka record")
+  void httpIngestWrong(Vertx vertx, VertxTestContext testContext) {
+    JsonObject body = new JsonObject();
+
+    given(requestSpecification)
+      .contentType(ContentType.JSON)
+      .body(body.encode())
+      .post("/ingest")
+      .then()
+      .assertThat()
+      .statusCode(400);
 
     kafkaConsumer.subscribe("incoming.steps")
       .toFlowable()
