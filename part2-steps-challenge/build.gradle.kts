@@ -19,6 +19,7 @@ subprojects {
   extra["logbackClassicVersion"] = "1.2.3"
   extra["assertjVersion"] = "3.11.1"
   extra["pgClientVersion"] = "0.11.3"
+  extra["testContainersVersion"] = "1.11.3"
 
   apply(plugin = "java")
   apply(plugin = "application")

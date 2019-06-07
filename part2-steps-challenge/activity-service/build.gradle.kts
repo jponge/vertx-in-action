@@ -5,6 +5,7 @@ dependencies {
   val restAssuredVersion = extra["restAssuredVersion"]
   val assertjVersion = extra["assertjVersion"]
   val pgClientVersion = extra["pgClientVersion"]
+  val testContainersVersion = extra["testContainersVersion"]
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
   implementation("io.vertx:vertx-web:$vertxVersion")
@@ -20,6 +21,8 @@ dependencies {
   testImplementation("io.vertx:vertx-junit5:$vertxVersion")
   testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
   testImplementation("org.assertj:assertj-core:$assertjVersion")
+
+  testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
 
   testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
 }

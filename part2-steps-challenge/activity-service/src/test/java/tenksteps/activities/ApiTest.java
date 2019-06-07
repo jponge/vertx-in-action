@@ -16,7 +16,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
 @DisplayName("HTTP API tests")
+@Testcontainers
 public class ApiTest {
+
+  @Container
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
 
   private static RequestSpecification requestSpecification;
 
@@ -41,7 +49,8 @@ public class ApiTest {
 
   private PgClient pgClient;
 
-  @BeforeEach // TODO close pgClient (needs next version)
+  @BeforeEach
+    // TODO close pgClient (needs next version)
   void prepareDb(Vertx vertx, VertxTestContext testContext) {
     String insertQuery = "INSERT INTO stepevent VALUES($1, $2, $3::timestamp, $4)";
     List<Tuple> data = Arrays.asList(

@@ -30,9 +30,7 @@ import static java.util.Arrays.asList;
 class IntegrationTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(
-    new File("../docker-compose.yml"))
-    .withLocalCompose(true);
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
 
   private RequestSpecification requestSpecification;
 

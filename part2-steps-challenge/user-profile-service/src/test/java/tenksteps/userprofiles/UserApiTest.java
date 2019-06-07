@@ -16,6 +16,11 @@ import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.mongo.MongoClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.io.File;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.with;
@@ -24,7 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
 @DisplayName("User profile API integration tests")
+@Testcontainers
 class UserApiTest {
+
+  @Container
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
 
   private static RequestSpecification requestSpecification;
 
