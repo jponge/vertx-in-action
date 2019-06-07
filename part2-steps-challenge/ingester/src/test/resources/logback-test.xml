@@ -1,0 +1,21 @@
+<configuration>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+  <logger name="org.testcontainers" level="INFO"/>
+  <logger name="com.github.dockerjava" level="WARN"/>
+
+  <logger name="io.netty" level="warn"/>
+  <logger name="io.vertx" level="info"/>
+  <logger name="org.apache.kafka" level="info"/>
+  <logger name="org.mongodb" level="info"/>
+
+</configuration>
