@@ -61,7 +61,7 @@ class IntegrationTest {
       .build();
 
     vertx
-      .rxDeployVerticle(new Main())
+      .rxDeployVerticle(new PublicApiVerticle())
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle("tenksteps.userprofiles.UserProfileApiVerticle"))
       .ignoreElement()

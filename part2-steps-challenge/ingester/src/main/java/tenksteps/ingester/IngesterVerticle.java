@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class Main extends AbstractVerticle {
+public class IngesterVerticle extends AbstractVerticle {
 
   private static final int HTTP_PORT = 3002;
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+  private static final Logger logger = LoggerFactory.getLogger(IngesterVerticle.class);
 
   private KafkaProducer<String, JsonObject> updateProducer;
 
@@ -134,7 +134,7 @@ public class Main extends AbstractVerticle {
   public static void main(String[] args) {
     System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     Vertx vertx = Vertx.vertx();
-    vertx.rxDeployVerticle(new Main())
+    vertx.rxDeployVerticle(new IngesterVerticle())
       .subscribe(
         ok -> logger.info("HTTP server started on port {}", HTTP_PORT),
         err -> logger.error("Woops", err));

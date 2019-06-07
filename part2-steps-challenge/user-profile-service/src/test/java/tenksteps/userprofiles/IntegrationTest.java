@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(VertxExtension.class)
 @DisplayName("User profile API integration tests")
 @Testcontainers
-class UserApiTest {
+class IntegrationTest {
 
   @Container
   private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));

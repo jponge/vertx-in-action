@@ -10,10 +10,10 @@ import io.vertx.reactivex.ext.web.handler.BodyHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Main extends AbstractVerticle {
+public class PublicApiVerticle extends AbstractVerticle {
 
   private static final int HTTP_PORT = 4000;
-  private static final Logger logger = LoggerFactory.getLogger(Main.class);
+  private static final Logger logger = LoggerFactory.getLogger(PublicApiVerticle.class);
 
   private WebClient webClient;
 
@@ -86,7 +86,7 @@ public class Main extends AbstractVerticle {
     System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
     Vertx vertx = Vertx.vertx();
     vertx
-      .rxDeployVerticle(new Main())
+      .rxDeployVerticle(new PublicApiVerticle())
       .subscribe(
         ok -> logger.info("HTTP server started on port {}", HTTP_PORT),
         err -> logger.error("Woops", err));

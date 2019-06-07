@@ -37,7 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(VertxExtension.class)
 @Testcontainers
-class IngesterTest {
+class IntegrationTest {
 
   @Container
   private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
@@ -81,7 +81,7 @@ class IngesterTest {
     amqpClient = AmqpClient.create(vertx, amqClientOptions());
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, kafkaConfig());
     vertx
-      .rxDeployVerticle(new Main())
+      .rxDeployVerticle(new IngesterVerticle())
       .delay(500, TimeUnit.MILLISECONDS, RxHelper.scheduler(vertx))
       .flatMapCompletable(id -> adminClient.rxDeleteTopics(singletonList("incoming.steps")))
       .onErrorComplete()
