@@ -36,7 +36,8 @@ public class Main extends AbstractVerticle {
 
     AmqpClientOptions amqpOptions = amqpConfig();
     AmqpReceiverOptions receiverOptions = new AmqpReceiverOptions()
-      .setAutoAcknowledgement(false);
+      .setAutoAcknowledgement(false)
+      .setDurable(true);
 
     AmqpClient.create(vertx, amqpOptions)
       .rxConnect()

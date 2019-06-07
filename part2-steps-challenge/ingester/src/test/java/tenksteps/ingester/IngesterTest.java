@@ -92,7 +92,10 @@ class IngesterTest {
       .flatMap(connection -> connection.rxCreateSender("step-events"))
       .subscribe(
         sender -> {
-          AmqpMessage msg = AmqpMessage.create().withJsonObjectAsBody(body).build();
+          AmqpMessage msg = AmqpMessage.create()
+            .durable(true)
+            .ttl(5000)
+            .withJsonObjectAsBody(body).build();
           sender.send(msg);
         },
         testContext::failNow);
@@ -120,7 +123,10 @@ class IngesterTest {
       .flatMap(connection -> connection.rxCreateSender("step-events"))
       .subscribe(
         sender -> {
-          AmqpMessage msg = AmqpMessage.create().withJsonObjectAsBody(body).build();
+          AmqpMessage msg = AmqpMessage.create()
+            .durable(true)
+            .ttl(5000)
+            .withJsonObjectAsBody(body).build();
           sender.send(msg);
         },
         testContext::failNow);
