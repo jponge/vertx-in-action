@@ -1,6 +1,5 @@
 package tenksteps.ingester;
 
-import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -75,6 +74,7 @@ class IngesterTest {
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, kafkaConfig());
     vertx
       .rxDeployVerticle(new Main())
+      .delay(500, TimeUnit.MILLISECONDS, RxHelper.scheduler(vertx))
       .flatMapCompletable(id -> adminClient.rxDeleteTopics(singletonList("incoming.steps")))
       .onErrorComplete()
       .subscribe(testContext::completeNow, testContext::failNow);
