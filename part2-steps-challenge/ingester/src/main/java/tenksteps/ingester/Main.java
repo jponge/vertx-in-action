@@ -43,9 +43,9 @@ public class Main extends AbstractVerticle {
       .flatMap(conn -> conn.rxCreateReceiver("step-events", receiverOptions))
       .toFlowable()
       .flatMap(AmqpReceiver::toFlowable)
-      .doOnError(this::handleAmqpError)
+      .doOnError(this::logAmqpError)
       .retryWhen(this::retryLater)
-      .subscribe(this::handleAmqpMessage, this::handleAmqpError);
+      .subscribe(this::handleAmqpMessage, this::logAmqpError);
 
     Router router = Router.router(vertx);
     router.post().handler(BodyHandler.create());
@@ -79,18 +79,18 @@ public class Main extends AbstractVerticle {
     return config;
   }
 
-  private void handleAmqpError(Throwable err) {
+  private void logAmqpError(Throwable err) {
     logger.error("Woops AMQP", err);
   }
 
   private void handleAmqpMessage(AmqpMessage message) {
-    JsonObject payload = message.bodyAsJsonObject();
-    if (invalidIngestedJson(payload)) {
-      logger.error("Invalid AMQP JSON (discarded): {}", payload.encode());
+    if (!"application/json".equals(message.contentType()) || invalidIngestedJson(message.bodyAsJsonObject())) {
+      logger.error("Invalid AMQP message (discarded): {}", message.bodyAsBinary());
       message.accepted();
       return;
     }
 
+    JsonObject payload = message.bodyAsJsonObject();
     KafkaProducerRecord<String, JsonObject> record = makeKafkaRecord(payload);
     updateProducer.rxSend(record).subscribe(
       ok -> message.accepted(),
