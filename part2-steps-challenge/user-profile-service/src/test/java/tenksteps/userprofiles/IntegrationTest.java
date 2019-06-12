@@ -83,6 +83,7 @@ class IntegrationTest {
     return new JsonObject()
       .put("username", "abc")
       .put("password", "123")
+      .put("email", "abc@email.me")
       .put("city", "Lyon")
       .put("deviceId", "a1b2c3")
       .put("makePublic", true);
@@ -247,6 +248,7 @@ class IntegrationTest {
       .jsonPath();
 
     assertThat(jsonPath.getString("username")).isEqualTo(user.getString("username"));
+    assertThat(jsonPath.getString("email")).isEqualTo(user.getString("email"));
     assertThat(jsonPath.getString("deviceId")).isEqualTo(user.getString("deviceId"));
     assertThat(jsonPath.getString("city")).isEqualTo(user.getString("city"));
     assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(user.getBoolean("makePublic"));
@@ -281,6 +283,7 @@ class IntegrationTest {
     JsonObject updated = basicUser();
     updated
       .put("deviceId", "vertx-in-action-123")
+      .put("email", "vertx@email.me")
       .put("city", "Nevers")
       .put("makePublic", false)
       .put("username", "Bean");
@@ -308,6 +311,7 @@ class IntegrationTest {
     assertThat(jsonPath.getString("deviceId")).isEqualTo(original.getString("deviceId"));
 
     assertThat(jsonPath.getString("city")).isEqualTo(updated.getString("city"));
+    assertThat(jsonPath.getString("email")).isEqualTo(updated.getString("email"));
     assertThat(jsonPath.getBoolean("makePublic")).isEqualTo(updated.getBoolean("makePublic"));
   }
 

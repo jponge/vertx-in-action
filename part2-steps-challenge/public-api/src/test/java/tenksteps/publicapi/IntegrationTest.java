@@ -39,6 +39,7 @@ class IntegrationTest {
       put("Foo", new JsonObject()
         .put("username", "Foo")
         .put("password", "foo-123")
+        .put("email", "foo@email.me")
         .put("city", "Lyon")
         .put("deviceId", "a1b2c3")
         .put("makePublic", true));
@@ -46,6 +47,7 @@ class IntegrationTest {
       put("Bar", new JsonObject()
         .put("username", "Bar")
         .put("password", "bar-#$69")
+        .put("email", "bar@email.me")
         .put("city", "Tassin-La-Demi-Lune")
         .put("deviceId", "def1234")
         .put("makePublic", false));

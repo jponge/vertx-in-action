@@ -80,6 +80,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   private boolean anyRegistrationFieldIsMissing(JsonObject body) {
     return !(body.containsKey("username") &&
       body.containsKey("password") &&
+      body.containsKey("email") &&
       body.containsKey("city") &&
       body.containsKey("deviceId") &&
       body.containsKey("makePublic"));
@@ -88,8 +89,12 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   private final Pattern validUsername = Pattern.compile("\\w+");
   private final Pattern validDeviceId = Pattern.compile("\\w[\\w+|-]*");
 
+  // Email regexp from https://www.owasp.org/index.php/OWASP_Validation_Regex_Repository
+  private final Pattern validEmail = Pattern.compile("^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
+
   private boolean anyRegistrationFieldIsWrong(JsonObject body) {
     return !validUsername.matcher(body.getString("username")).matches() ||
+      !validEmail.matcher(body.getString("email")).matches() ||
       body.getString("password").trim().isEmpty() ||
       !validDeviceId.matcher(body.getString("deviceId")).matches();
   }
@@ -101,6 +106,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
 
     JsonObject extraInfo = new JsonObject()
       .put("$set", new JsonObject()
+        .put("email", body.getString("email"))
         .put("city", body.getString("city"))
         .put("deviceId", body.getString("deviceId"))
         .put("makePublic", body.getBoolean("makePublic")));
@@ -159,6 +165,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     JsonObject fields = new JsonObject()
       .put("_id", 0)
       .put("username", 1)
+      .put("email", 1)
       .put("deviceId", 1)
       .put("city", 1)
       .put("makePublic", 1);
@@ -193,6 +200,9 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     JsonObject updates = new JsonObject();
     if (body.containsKey("city")) {
       updates.put("city", body.getString("city"));
+    }
+    if (body.containsKey("email")) {
+      updates.put("email", body.getString("email"));
     }
     if (body.containsKey("makePublic")) {
       updates.put("makePublic", body.getBoolean("makePublic"));
