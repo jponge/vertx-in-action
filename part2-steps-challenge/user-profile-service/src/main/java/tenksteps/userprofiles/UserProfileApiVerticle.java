@@ -241,11 +241,8 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   }
 
   private void handleAuthenticationError(RoutingContext ctx, Throwable err) {
-    if (err instanceof AuthenticationException) {
-      ctx.response().setStatusCode(401).end();
-    } else {
-      fail500(ctx, err);
-    }
+    logger.error("Authentication problem {}", err.getMessage());
+    ctx.response().setStatusCode(401).end();
   }
 
   private void whoOwns(RoutingContext ctx) {
