@@ -156,7 +156,7 @@ public class PublicApiVerticle extends AbstractVerticle {
 
   private void forwardJsonOrStatusCode(RoutingContext ctx, HttpResponse<JsonObject> resp) {
     if (resp.statusCode() != 200) {
-      ctx.response().setStatusCode(resp.statusCode());
+      ctx.response().setStatusCode(resp.statusCode()).end();
     } else {
       ctx.response()
         .putHeader("Content-Type", "application/json")
@@ -187,11 +187,30 @@ public class PublicApiVerticle extends AbstractVerticle {
   }
 
   private void monthlySteps(RoutingContext ctx) {
-
+    String deviceId = ctx.user().principal().getString("deviceId");
+    String year = ctx.pathParam("year");
+    String month = ctx.pathParam("month");
+    webClient
+      .get(3001, "localhost", "/" + deviceId + "/" + year + "/" + month)
+      .as(BodyCodec.jsonObject())
+      .rxSend()
+      .subscribe(
+        resp -> forwardJsonOrStatusCode(ctx, resp),
+        err -> sendBadGateway(ctx, err));
   }
 
   private void dailySteps(RoutingContext ctx) {
-
+    String deviceId = ctx.user().principal().getString("deviceId");
+    String year = ctx.pathParam("year");
+    String month = ctx.pathParam("month");
+    String day = ctx.pathParam("day");
+    webClient
+      .get(3001, "localhost", "/" + deviceId + "/" + year + "/" + month + "/" + day)
+      .as(BodyCodec.jsonObject())
+      .rxSend()
+      .subscribe(
+        resp -> forwardJsonOrStatusCode(ctx, resp),
+        err -> sendBadGateway(ctx, err));
   }
 
   public static void main(String[] args) {
