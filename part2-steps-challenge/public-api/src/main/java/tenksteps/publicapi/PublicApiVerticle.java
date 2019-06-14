@@ -16,6 +16,7 @@ import io.vertx.reactivex.ext.web.client.WebClient;
 import io.vertx.reactivex.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.reactivex.ext.web.codec.BodyCodec;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
+import io.vertx.reactivex.ext.web.handler.JWTAuthHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,24 +32,6 @@ public class PublicApiVerticle extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-    Router router = Router.router(vertx);
-    BodyHandler bodyHandler = BodyHandler.create();
-    router.post().handler(bodyHandler);
-    router.put().handler(bodyHandler);
-
-    String prefix = "/api/v1";
-    // Account
-    router.post(prefix + "/register").handler(this::register);
-    router.post(prefix + "/token").handler(this::token);
-    // Profile
-    router.get(prefix + "/:username").handler(this::fetchUser);
-    router.put(prefix + "/:username").handler(this::updateUser);
-    // Data
-    router.get(prefix + "/:username/total").handler(this::totalSteps);
-    router.get(prefix + "/:username/:year/:month").handler(this::monthlySteps);
-    router.get(prefix + "/:username/:year/:month/:day").handler(this::dailySteps);
-
-    webClient = WebClient.create(vertx);
 
     String publicKey;
     String privateKey;
@@ -65,6 +48,29 @@ public class PublicApiVerticle extends AbstractVerticle {
         .setPublicKey(publicKey)
         .setSecretKey(privateKey)));
 
+    Router router = Router.router(vertx);
+    BodyHandler bodyHandler = BodyHandler.create();
+    router.post().handler(bodyHandler);
+    router.put().handler(bodyHandler);
+
+    String prefix = "/api/v1";
+    JWTAuthHandler jwtHandler = JWTAuthHandler.create(jwtAuth);
+
+    // Account
+    router.post(prefix + "/register").handler(this::register);
+    router.post(prefix + "/token").handler(this::token);
+
+    // Profile
+    router.get(prefix + "/:username").handler(jwtHandler).handler(this::fetchUser);
+    router.put(prefix + "/:username").handler(jwtHandler).handler(this::updateUser);
+
+    // Data
+    router.get(prefix + "/:username/total").handler(jwtHandler).handler(this::totalSteps);
+    router.get(prefix + "/:username/:year/:month").handler(jwtHandler).handler(this::monthlySteps);
+    router.get(prefix + "/:username/:year/:month/:day").handler(jwtHandler).handler(this::dailySteps);
+
+    webClient = WebClient.create(vertx);
+
     return vertx.createHttpServer()
       .requestHandler(router)
       .rxListen(HTTP_PORT)
@@ -77,12 +83,12 @@ public class PublicApiVerticle extends AbstractVerticle {
       .rxSendJson(ctx.getBodyAsJson())
       .subscribe(
         response -> ctx.response().setStatusCode(response.statusCode()).end(),
-        err -> internalError(err, ctx));
+        err -> sendBadGateway(err, ctx));
   }
 
-  private void internalError(Throwable err, RoutingContext ctx) {
+  private void sendBadGateway(Throwable err, RoutingContext ctx) {
     logger.error("Woops", err);
-    ctx.fail(500);
+    ctx.fail(502);
   }
 
   private void token(RoutingContext ctx) {
@@ -129,7 +135,20 @@ public class PublicApiVerticle extends AbstractVerticle {
   }
 
   private void fetchUser(RoutingContext ctx) {
+    webClient
+      .get(3000, "localhost", "/" + ctx.pathParam("username"))
+      .expect(ResponsePredicate.SC_OK)
+      .as(BodyCodec.jsonObject())
+      .rxSend()
+      .subscribe(
+        resp -> forwardJson(ctx, resp),
+        err -> sendBadGateway(err, ctx));
+  }
 
+  private void forwardJson(RoutingContext ctx, HttpResponse<JsonObject> resp) {
+    ctx.response()
+      .putHeader("Content-Type", "application/json")
+      .end(resp.body().encode());
   }
 
   private void updateUser(RoutingContext ctx) {
