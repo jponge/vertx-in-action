@@ -89,6 +89,7 @@ public class PublicApiVerticle extends AbstractVerticle {
   private void register(RoutingContext ctx) {
     webClient
       .post(3000, "localhost", "/register")
+      .putHeader("Content-Type", "application/json")
       .rxSendJson(ctx.getBodyAsJson())
       .subscribe(
         response -> ctx.response().setStatusCode(response.statusCode()).end(),
@@ -161,7 +162,14 @@ public class PublicApiVerticle extends AbstractVerticle {
   }
 
   private void updateUser(RoutingContext ctx) {
-
+    webClient
+      .put(3000, "localhost", "/" + ctx.pathParam("username"))
+      .putHeader("Content-Type", "application/json")
+      .expect(ResponsePredicate.SC_OK)
+      .rxSendBuffer(ctx.getBody())
+      .subscribe(
+        resp -> ctx.response().end(),
+        err -> sendBadGateway(err, ctx));
   }
 
   private void totalSteps(RoutingContext ctx) {
