@@ -93,10 +93,10 @@ public class PublicApiVerticle extends AbstractVerticle {
       .rxSendJson(ctx.getBodyAsJson())
       .subscribe(
         response -> ctx.response().setStatusCode(response.statusCode()).end(),
-        err -> sendBadGateway(err, ctx));
+        err -> sendBadGateway(ctx, err));
   }
 
-  private void sendBadGateway(Throwable err, RoutingContext ctx) {
+  private void sendBadGateway(RoutingContext ctx, Throwable err) {
     logger.error("Woops", err);
     ctx.fail(502);
   }
@@ -147,18 +147,21 @@ public class PublicApiVerticle extends AbstractVerticle {
   private void fetchUser(RoutingContext ctx) {
     webClient
       .get(3000, "localhost", "/" + ctx.pathParam("username"))
-      .expect(ResponsePredicate.SC_OK)
       .as(BodyCodec.jsonObject())
       .rxSend()
       .subscribe(
-        resp -> forwardJson(ctx, resp),
-        err -> sendBadGateway(err, ctx));
+        resp -> forwardJsonOrStatusCode(ctx, resp),
+        err -> sendBadGateway(ctx, err));
   }
 
-  private void forwardJson(RoutingContext ctx, HttpResponse<JsonObject> resp) {
-    ctx.response()
-      .putHeader("Content-Type", "application/json")
-      .end(resp.body().encode());
+  private void forwardJsonOrStatusCode(RoutingContext ctx, HttpResponse<JsonObject> resp) {
+    if (resp.statusCode() != 200) {
+      ctx.response().setStatusCode(resp.statusCode());
+    } else {
+      ctx.response()
+        .putHeader("Content-Type", "application/json")
+        .end(resp.body().encode());
+    }
   }
 
   private void updateUser(RoutingContext ctx) {
@@ -169,11 +172,18 @@ public class PublicApiVerticle extends AbstractVerticle {
       .rxSendBuffer(ctx.getBody())
       .subscribe(
         resp -> ctx.response().end(),
-        err -> sendBadGateway(err, ctx));
+        err -> sendBadGateway(ctx, err));
   }
 
   private void totalSteps(RoutingContext ctx) {
-
+    String deviceId = ctx.user().principal().getString("deviceId");
+    webClient
+      .get(3001, "localhost", "/" + deviceId + "/total")
+      .as(BodyCodec.jsonObject())
+      .rxSend()
+      .subscribe(
+        resp -> forwardJsonOrStatusCode(ctx, resp),
+        err -> sendBadGateway(ctx, err));
   }
 
   private void monthlySteps(RoutingContext ctx) {
