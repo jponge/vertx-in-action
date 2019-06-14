@@ -61,13 +61,13 @@ public class PublicApiVerticle extends AbstractVerticle {
     router.post(prefix + "/token").handler(this::token);
 
     // Profile
-    router.get(prefix + "/:username").handler(jwtHandler).handler(this::fetchUser);
-    router.put(prefix + "/:username").handler(jwtHandler).handler(this::updateUser);
+    router.get(prefix + "/:username").handler(jwtHandler).handler(this::checkUser).handler(this::fetchUser);
+    router.put(prefix + "/:username").handler(jwtHandler).handler(this::checkUser).handler(this::updateUser);
 
     // Data
-    router.get(prefix + "/:username/total").handler(jwtHandler).handler(this::totalSteps);
-    router.get(prefix + "/:username/:year/:month").handler(jwtHandler).handler(this::monthlySteps);
-    router.get(prefix + "/:username/:year/:month/:day").handler(jwtHandler).handler(this::dailySteps);
+    router.get(prefix + "/:username/total").handler(jwtHandler).handler(this::checkUser).handler(this::totalSteps);
+    router.get(prefix + "/:username/:year/:month").handler(jwtHandler).handler(this::checkUser).handler(this::monthlySteps);
+    router.get(prefix + "/:username/:year/:month/:day").handler(jwtHandler).handler(this::checkUser).handler(this::dailySteps);
 
     webClient = WebClient.create(vertx);
 
@@ -75,6 +75,15 @@ public class PublicApiVerticle extends AbstractVerticle {
       .requestHandler(router)
       .rxListen(HTTP_PORT)
       .ignoreElement();
+  }
+
+  private void checkUser(RoutingContext ctx) {
+    String subject = ctx.user().principal().getString("sub");
+    if (!ctx.pathParam("username").equals(subject)) {
+      ctx.response().setStatusCode(403).end();
+    } else {
+      ctx.next();
+    }
   }
 
   private void register(RoutingContext ctx) {
