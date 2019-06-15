@@ -3,6 +3,7 @@ package tenksteps.publicapi;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class CryptoHelper {
@@ -16,8 +17,12 @@ class CryptoHelper {
   }
 
   private static String read(String file) throws IOException {
+    Path path = Paths.get("public-api", file);
+    if (!path.toFile().exists()) {
+      path = Paths.get("..","public-api", file);
+    }
     return Files
-      .readAllLines(Paths.get("public-api", file), StandardCharsets.UTF_8)
+      .readAllLines(path, StandardCharsets.UTF_8)
       .stream()
       .filter(line -> !line.startsWith("-----"))
       .reduce(String::concat)
