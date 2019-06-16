@@ -1,18 +1,18 @@
 package tenksteps.activities;
 
-import io.reactiverse.pgclient.PgException;
-import io.reactiverse.reactivex.pgclient.PgClient;
-import io.reactiverse.reactivex.pgclient.PgConnection;
-import io.reactiverse.reactivex.pgclient.Tuple;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.vertx.core.json.JsonObject;
+import io.vertx.pgclient.PgException;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumerRecord;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
+import io.vertx.reactivex.pgclient.PgPool;
+import io.vertx.reactivex.sqlclient.Tuple;
+import io.vertx.sqlclient.PoolOptions;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,25 +26,16 @@ public class EventsVerticle extends AbstractVerticle {
 
   private static final Logger logger = LoggerFactory.getLogger(EventsVerticle.class);
 
-  private PgClient pgClient;
   private KafkaConsumer<String, JsonObject> eventConsumer;
   private KafkaProducer<String, JsonObject> updateProducer;
+  private PgPool pgPool;
 
   @Override
   public Completable rxStart() {
     eventConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetEarliest("activity-service"));
     updateProducer = KafkaProducer.create(vertx, KafkaConfig.producer());
-    return PgClient.rxConnect(vertx, PgConfig.pgOpts())
-      .map(this::setPgClient)
-      .flatMapCompletable(conn -> setupConsumer());
-  }
+    pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
 
-  private PgConnection setPgClient(PgConnection pgClient) {
-    this.pgClient = pgClient;
-    return pgClient;
-  }
-
-  private Completable setupConsumer() {
     eventConsumer
       .subscribe("incoming.steps")
       .toFlowable()
@@ -54,6 +45,7 @@ public class EventsVerticle extends AbstractVerticle {
       .doOnError(err -> logger.error("Woops", err))
       .retryWhen(this::retryLater)
       .subscribe();
+
     return Completable.complete();
   }
 
@@ -70,7 +62,7 @@ public class EventsVerticle extends AbstractVerticle {
       data.getLong("deviceSync"),
       data.getInteger("stepsCount"));
 
-    return pgClient
+    return pgPool
       .rxPreparedQuery(insertStepEvent(), values)
       .map(rs -> record)
       .onErrorReturn(err -> {
@@ -89,7 +81,7 @@ public class EventsVerticle extends AbstractVerticle {
 
   private Flowable<KafkaConsumerRecord<String, JsonObject>> generateActivityUpdate(KafkaConsumerRecord<String, JsonObject> record) {
     String deviceId = record.value().getString("deviceId");
-    return pgClient
+    return pgPool
       .rxPreparedQuery(stepsCountForToday(), Tuple.of(deviceId))
       .map(rs -> rs.iterator().next())
       .map(row -> new JsonObject()

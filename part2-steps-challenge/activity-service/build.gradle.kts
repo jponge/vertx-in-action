@@ -4,7 +4,6 @@ dependencies {
   val logbackClassicVersion = extra["logbackClassicVersion"]
   val restAssuredVersion = extra["restAssuredVersion"]
   val assertjVersion = extra["assertjVersion"]
-  val pgClientVersion = extra["pgClientVersion"]
   val testContainersVersion = extra["testContainersVersion"]
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
@@ -15,7 +14,7 @@ dependencies {
     exclude("org.slf4j")
     exclude("log4j")
   }
-  implementation("io.reactiverse:reactive-pg-client:$pgClientVersion")
+  implementation("io.vertx:vertx-pg-client:$vertxVersion")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
   testImplementation("io.vertx:vertx-junit5:$vertxVersion")

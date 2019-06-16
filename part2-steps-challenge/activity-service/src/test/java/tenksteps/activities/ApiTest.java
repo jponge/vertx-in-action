@@ -1,7 +1,6 @@
 package tenksteps.activities;
 
-import io.reactiverse.reactivex.pgclient.PgClient;
-import io.reactiverse.reactivex.pgclient.Tuple;
+import io.reactivex.Completable;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -11,6 +10,9 @@ import io.restassured.specification.RequestSpecification;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.Vertx;
+import io.vertx.reactivex.pgclient.PgPool;
+import io.vertx.reactivex.sqlclient.Tuple;
+import io.vertx.sqlclient.PoolOptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,10 +49,7 @@ public class ApiTest {
       .build();
   }
 
-  private PgClient pgClient;
-
   @BeforeEach
-    // TODO close pgClient (needs next version)
   void prepareDb(Vertx vertx, VertxTestContext testContext) {
     String insertQuery = "INSERT INTO stepevent VALUES($1, $2, $3::timestamp, $4)";
     List<Tuple> data = Arrays.asList(
@@ -60,13 +59,14 @@ public class ApiTest {
       Tuple.of("456", 1, LocalDateTime.of(2019, 5, 21, 10, 15), 123),
       Tuple.of("123", 4, LocalDateTime.of(2019, 5, 21, 11, 0), 320)
     );
-    PgClient.rxConnect(vertx, PgConfig.pgOpts())
-      .doOnSuccess(pgConnection -> this.pgClient = pgConnection)
-      .flatMap(c -> pgClient.rxQuery("DELETE FROM stepevent"))
-      .flatMap(rs -> pgClient.rxPreparedBatch(insertQuery, data))
+    PgPool pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
+
+    pgPool.rxQuery("DELETE FROM stepevent")
+      .flatMap(rows -> pgPool.rxPreparedBatch(insertQuery, data))
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle(new ActivityApiVerticle()))
       .ignoreElement()
+      .andThen(Completable.fromAction(pgPool::close))
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 

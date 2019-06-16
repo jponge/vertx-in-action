@@ -1,11 +1,11 @@
 package tenksteps.activities;
 
-import io.reactiverse.pgclient.PgPoolOptions;
+import io.vertx.pgclient.PgConnectOptions;
 
 class PgConfig {
 
-  public static PgPoolOptions pgOpts() {
-    return new PgPoolOptions()
+  public static PgConnectOptions pgConnectOpts() {
+    return new PgConnectOptions()
       .setHost("localhost")
       .setDatabase("postgres")
       .setUser("postgres")

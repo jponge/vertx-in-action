@@ -1,6 +1,6 @@
 package tenksteps.activities;
 
-import io.reactiverse.reactivex.pgclient.PgClient;
+import io.reactivex.Completable;
 import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -9,6 +9,8 @@ import io.vertx.reactivex.kafka.admin.KafkaAdminClient;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
+import io.vertx.reactivex.pgclient.PgPool;
+import io.vertx.sqlclient.PoolOptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,6 @@ class EventProcessingTest {
   @Container
   private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
 
-  private PgClient pgClient;
   private KafkaConsumer<String, JsonObject> consumer;
   private KafkaProducer<String, JsonObject> producer;
 
@@ -39,10 +40,11 @@ class EventProcessingTest {
     consumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetEarliest("activity-service-test-" + System.currentTimeMillis()));
     producer = KafkaProducer.create(vertx, KafkaConfig.producer());
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, KafkaConfig.producer());
-    PgClient.rxConnect(vertx, PgConfig.pgOpts())
-      .doOnSuccess(pgConnection -> this.pgClient = pgConnection)
-      .flatMap(pgConnection -> pgConnection.rxQuery("DELETE FROM stepevent"))
+
+    PgPool pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
+    pgPool.rxQuery("DELETE FROM stepevent")
       .flatMapCompletable(rs -> adminClient.rxDeleteTopics(Arrays.asList("incoming.steps", "daily.step.updates")))
+      .andThen(Completable.fromAction(pgPool::close))
       .onErrorComplete()
       .subscribe(
         testContext::completeNow,

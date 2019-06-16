@@ -1,16 +1,14 @@
 package tenksteps.activities;
 
-import io.reactiverse.reactivex.pgclient.PgClient;
-import io.reactiverse.reactivex.pgclient.PgConnection;
-import io.reactiverse.reactivex.pgclient.Row;
-import io.reactiverse.reactivex.pgclient.Tuple;
 import io.reactivex.Completable;
-import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
-import io.vertx.reactivex.core.http.HttpServer;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
+import io.vertx.reactivex.pgclient.PgPool;
+import io.vertx.reactivex.sqlclient.Row;
+import io.vertx.reactivex.sqlclient.Tuple;
+import io.vertx.sqlclient.PoolOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,29 +20,27 @@ public class ActivityApiVerticle extends AbstractVerticle {
   static final int HTTP_PORT = 3001;
   private static final Logger logger = LoggerFactory.getLogger(ActivityApiVerticle.class);
 
-  private PgClient pgClient;
+  private PgPool pgPool;
 
   @Override
   public Completable rxStart() {
+    pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
+
     Router router = Router.router(vertx);
     router.get("/:deviceId/total").handler(this::totalSteps);
     router.get("/:deviceId/:year/:month").handler(this::stepsOnMonth);
     router.get("/:deviceId/:year/:month/:day").handler(this::stepsOnDay);
 
-    Single<HttpServer> serverStart = vertx.createHttpServer()
+    return vertx.createHttpServer()
       .requestHandler(router)
-      .rxListen(HTTP_PORT);
-
-    Single<PgConnection> dbConnect = PgClient.rxConnect(vertx, PgConfig.pgOpts());
-
-    return Single.zip(serverStart, dbConnect, (http, db) -> setPgClient(db))
+      .rxListen(HTTP_PORT)
       .ignoreElement();
   }
 
   private void totalSteps(RoutingContext ctx) {
     String deviceId = ctx.pathParam("deviceId");
     Tuple params = Tuple.of(deviceId);
-    pgClient.rxPreparedQuery(SqlQueries.totalStepsCount(), params)
+    pgPool.rxPreparedQuery(SqlQueries.totalStepsCount(), params)
       .map(rs -> rs.iterator().next())
       .subscribe(
         row -> sendCount(ctx, row),
@@ -81,7 +77,7 @@ public class ActivityApiVerticle extends AbstractVerticle {
         Integer.valueOf(ctx.pathParam("month")),
         1, 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
-      pgClient.rxPreparedQuery(SqlQueries.monthlyStepsCount(), params)
+      pgPool.rxPreparedQuery(SqlQueries.monthlyStepsCount(), params)
         .map(rs -> rs.iterator().next())
         .subscribe(
           row -> sendCount(ctx, row),
@@ -103,7 +99,7 @@ public class ActivityApiVerticle extends AbstractVerticle {
         Integer.valueOf(ctx.pathParam("month")),
         Integer.valueOf(ctx.pathParam("day")), 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
-      pgClient.rxPreparedQuery(SqlQueries.dailyStepsCount(), params)
+      pgPool.rxPreparedQuery(SqlQueries.dailyStepsCount(), params)
         .map(rs -> rs.iterator().next())
         .subscribe(
           row -> sendCount(ctx, row),
@@ -112,10 +108,4 @@ public class ActivityApiVerticle extends AbstractVerticle {
       sendBadRequest(ctx);
     }
   }
-
-  private PgClient setPgClient(PgConnection dbClient) {
-    pgClient = dbClient;
-    return pgClient;
-  }
-
 }
