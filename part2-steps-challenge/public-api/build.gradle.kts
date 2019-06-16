@@ -18,6 +18,7 @@ dependencies {
   testImplementation("org.assertj:assertj-core:$assertjVersion")
 
   testImplementation(project(":user-profile-service"))
+  testImplementation(project(":activity-service"))
   testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
 
   testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
