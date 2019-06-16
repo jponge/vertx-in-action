@@ -280,6 +280,4 @@ class IntegrationTest {
       .assertThat()
       .statusCode(403);
   }
-
-
 }
