@@ -19,6 +19,7 @@ dependencies {
 
   testImplementation(project(":user-profile-service"))
   testImplementation(project(":activity-service"))
+  testImplementation("io.vertx:vertx-pg-client:$vertxVersion")
   testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
 
   testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
