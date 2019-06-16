@@ -87,17 +87,17 @@ public class IngesterVerticle extends AbstractVerticle {
   private void handleAmqpMessage(AmqpMessage message) {
     if (!"application/json".equals(message.contentType()) || invalidIngestedJson(message.bodyAsJsonObject())) {
       logger.error("Invalid AMQP message (discarded): {}", message.bodyAsBinary());
-      message.accepted();
+      message.getDelegate().accepted(); // TODO fixme once rx2 codegen is fixed
       return;
     }
 
     JsonObject payload = message.bodyAsJsonObject();
     KafkaProducerRecord<String, JsonObject> record = makeKafkaRecord(payload);
     updateProducer.rxSend(record).subscribe(
-      ok -> message.accepted(),
+      ok -> message.getDelegate().accepted(),
       err -> {
         logger.error("AMQP ingestion failed", err);
-        message.rejected();
+        message.getDelegate().rejected();
       });
   }
 

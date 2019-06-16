@@ -67,7 +67,7 @@ class IntegrationTest {
   }
 
   private Single<MongoClientDeleteResult> dropAllUsers() {
-    return mongoClient.rxRemoveDocuments("user", new JsonObject()).toSingle();
+    return mongoClient.rxRemoveDocuments("user", new JsonObject());
   }
 
   @AfterEach
