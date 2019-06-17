@@ -2,6 +2,7 @@ package tenksteps.publicapi;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
@@ -16,11 +17,14 @@ import io.vertx.reactivex.ext.web.client.WebClient;
 import io.vertx.reactivex.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.reactivex.ext.web.codec.BodyCodec;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
+import io.vertx.reactivex.ext.web.handler.CorsHandler;
 import io.vertx.reactivex.ext.web.handler.JWTAuthHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PublicApiVerticle extends AbstractVerticle {
 
@@ -49,6 +53,26 @@ public class PublicApiVerticle extends AbstractVerticle {
         .setSecretKey(privateKey)));
 
     Router router = Router.router(vertx);
+
+    Set<String> allowedHeaders = new HashSet<>();
+    allowedHeaders.add("x-requested-with");
+    allowedHeaders.add("Access-Control-Allow-Origin");
+    allowedHeaders.add("origin");
+    allowedHeaders.add("Content-Type");
+    allowedHeaders.add("accept");
+    allowedHeaders.add("Authorization");
+
+    Set<HttpMethod> allowedMethods = new HashSet<>();
+    allowedMethods.add(HttpMethod.GET);
+    allowedMethods.add(HttpMethod.POST);
+    allowedMethods.add(HttpMethod.OPTIONS);
+    allowedMethods.add(HttpMethod.PUT);
+
+    router.route().handler(CorsHandler
+      .create("*")
+      .allowedHeaders(allowedHeaders)
+      .allowedMethods(allowedMethods));
+
     BodyHandler bodyHandler = BodyHandler.create();
     router.post().handler(bodyHandler);
     router.put().handler(bodyHandler);
