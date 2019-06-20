@@ -37,6 +37,7 @@ public class CongratsVerticle extends AbstractVerticle {
     consumer.subscribe("daily.step.updates")
       .toFlowable()
       .filter(this::above10k)
+      .distinct(KafkaConsumerRecord::key)
       .flatMapSingle(this::sendmail)
       .doOnError(err -> logger.error("Woops", err))
       .retryWhen(this::retryLater)

@@ -17,6 +17,7 @@ import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 import static tenksteps.activities.SqlQueries.insertStepEvent;
@@ -81,6 +82,8 @@ public class EventsVerticle extends AbstractVerticle {
 
   private Flowable<KafkaConsumerRecord<String, JsonObject>> generateActivityUpdate(KafkaConsumerRecord<String, JsonObject> record) {
     String deviceId = record.value().getString("deviceId");
+    LocalDateTime now = LocalDateTime.now();
+    String key = deviceId + ":" + now.getYear() + "-" + now.getMonth() + "-" + now.getDayOfMonth();
     return pgPool
       .rxPreparedQuery(stepsCountForToday(), Tuple.of(deviceId))
       .map(rs -> rs.iterator().next())
@@ -88,7 +91,7 @@ public class EventsVerticle extends AbstractVerticle {
         .put("deviceId", deviceId)
         .put("timestamp", row.getTemporal(0).toString())
         .put("stepsCount", row.getLong(1)))
-      .flatMap(json -> updateProducer.rxSend(KafkaProducerRecord.create("daily.step.updates", deviceId, json)))
+      .flatMap(json -> updateProducer.rxSend(KafkaProducerRecord.create("daily.step.updates", key, json)))
       .map(rs -> record)
       .toFlowable();
   }
