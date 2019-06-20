@@ -50,3 +50,9 @@ services:
     image: vromero/activemq-artemis:2-alpine-latest
     ports:
       - "5672:5672"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
