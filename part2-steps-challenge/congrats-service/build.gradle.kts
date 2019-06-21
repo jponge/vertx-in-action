@@ -2,7 +2,6 @@ dependencies {
   val vertxVersion = extra["vertxVersion"]
   val junit5Version = extra["junit5Version"]
   val logbackClassicVersion = extra["logbackClassicVersion"]
-  val restAssuredVersion = extra["restAssuredVersion"]
   val assertjVersion = extra["assertjVersion"]
   val testContainersVersion = extra["testContainersVersion"]
 
@@ -18,7 +17,7 @@ dependencies {
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
   testImplementation("io.vertx:vertx-junit5:$vertxVersion")
-  testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
+  testImplementation("io.vertx:vertx-web:$vertxVersion")
   testImplementation("org.assertj:assertj-core:$assertjVersion")
 
   testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
