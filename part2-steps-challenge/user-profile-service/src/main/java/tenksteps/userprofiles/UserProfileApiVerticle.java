@@ -133,7 +133,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
     if (isIndexViolated(err)) {
       return mongoClient
         .rxRemoveDocument("user", query)
-        .flatMapMaybe(del -> Maybe.error(err));
+        .flatMap(del -> Maybe.error(err));
     } else {
       return Maybe.error(err);
     }

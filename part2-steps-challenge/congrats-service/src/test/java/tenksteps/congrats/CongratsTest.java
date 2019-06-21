@@ -57,6 +57,8 @@ class CongratsTest {
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle(new FakeUserService()))
       .ignoreElement()
+      .andThen(webClient.delete(8025, "localhost", "/api/v1/messages").rxSend())
+      .ignoreElement()
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 
@@ -71,9 +73,11 @@ class CongratsTest {
   }
 
   @Test
+  @DisplayName("No email must be sent below 10k steps")
   void checkNothingBelow10k(Vertx vertx, VertxTestContext testContext) {
     producer
-      .rxWrite(record("123", 5000))
+      .rxSend(record("123", 5000))
+      .ignoreElement()
       .delay(3, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
       .andThen(webClient
         .get(8025, "localhost", "/api/v2/search?kind=to&query=foo@mail.tld")
@@ -81,7 +85,6 @@ class CongratsTest {
       .map(HttpResponse::body)
       .subscribe(
         json -> {
-          System.out.println(json.encodePrettily());
           testContext.verify(() -> assertThat(json.getInteger("total")).isEqualTo(0));
           testContext.completeNow();
         },
@@ -89,9 +92,11 @@ class CongratsTest {
   }
 
   @Test
+  @DisplayName("An email must be sent for 10k+ steps")
   void checkSendsOver10k(Vertx vertx, VertxTestContext testContext) {
     producer
-      .rxWrite(record("123", 11_000))
+      .rxSend(record("123", 11_000))
+      .ignoreElement()
       .delay(3, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
       .andThen(webClient
         .get(8025, "localhost", "/api/v2/search?kind=to&query=foo@mail.tld")
@@ -99,7 +104,37 @@ class CongratsTest {
       .map(HttpResponse::body)
       .subscribe(
         json -> {
-          System.out.println(json.encodePrettily());
+          testContext.verify(() -> assertThat(json.getInteger("total")).isEqualTo(1));
+          testContext.completeNow();
+        },
+        testContext::failNow);
+  }
+
+  @Test
+  @DisplayName("Just one email must be sent to a user for 10k+ steps on single day")
+  void checkNotTwiceToday(Vertx vertx, VertxTestContext testContext) {
+    producer
+      .rxSend(record("123", 11_000))
+      .ignoreElement()
+      .delay(3, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
+      .andThen(webClient
+        .get(8025, "localhost", "/api/v2/search?kind=to&query=foo@mail.tld")
+        .as(BodyCodec.jsonObject()).rxSend())
+      .map(HttpResponse::body)
+      .map(json -> {
+        testContext.verify(() -> assertThat(json.getInteger("total")).isEqualTo(1));
+        return json;
+      })
+      .ignoreElement()
+      .andThen(producer.rxSend(record("123", 11_100)))
+      .ignoreElement()
+      .delay(3, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
+      .andThen(webClient
+        .get(8025, "localhost", "/api/v2/search?kind=to&query=foo@mail.tld")
+        .as(BodyCodec.jsonObject()).rxSend())
+      .map(HttpResponse::body)
+      .subscribe(
+        json -> {
           testContext.verify(() -> assertThat(json.getInteger("total")).isEqualTo(1));
           testContext.completeNow();
         },

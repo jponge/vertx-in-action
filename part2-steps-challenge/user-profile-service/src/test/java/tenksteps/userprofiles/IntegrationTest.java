@@ -1,6 +1,6 @@
 package tenksteps.userprofiles;
 
-import io.reactivex.Single;
+import io.reactivex.Maybe;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -60,13 +60,13 @@ class IntegrationTest {
       .rxCreateIndexWithOptions("user", new JsonObject().put("username", 1), new IndexOptions().unique(true))
       .andThen(mongoClient.rxCreateIndexWithOptions("user", new JsonObject().put("deviceId", 1), new IndexOptions().unique(true)))
       .andThen(dropAllUsers())
-      .flatMap(res -> vertx.rxDeployVerticle(new UserProfileApiVerticle()))
+      .flatMapSingle(res -> vertx.rxDeployVerticle(new UserProfileApiVerticle()))
       .subscribe(
         ok -> testContext.completeNow(),
         testContext::failNow);
   }
 
-  private Single<MongoClientDeleteResult> dropAllUsers() {
+  private Maybe<MongoClientDeleteResult> dropAllUsers() {
     return mongoClient.rxRemoveDocuments("user", new JsonObject());
   }
 

@@ -10,7 +10,7 @@ class KafkaConfig {
     config.put("bootstrap.servers", "localhost:9092");
     config.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     config.put("value.deserializer", "io.vertx.kafka.client.serialization.JsonObjectDeserializer");
-    config.put("auto.offset.reset", "latest");
+    config.put("auto.offset.reset", "earliest");
     config.put("enable.auto.commit", "true");
     config.put("group.id", group);
     return config;
