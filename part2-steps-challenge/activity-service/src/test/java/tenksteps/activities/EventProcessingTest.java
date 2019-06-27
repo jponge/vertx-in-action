@@ -37,7 +37,7 @@ class EventProcessingTest {
 
   @BeforeEach
   void resetPgAndKafka(Vertx vertx, VertxTestContext testContext) {
-    consumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetEarliest("activity-service-test-" + System.currentTimeMillis()));
+    consumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("activity-service-test-" + System.currentTimeMillis()));
     producer = KafkaProducer.create(vertx, KafkaConfig.producer());
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, KafkaConfig.producer());
 

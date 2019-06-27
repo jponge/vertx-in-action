@@ -1,4 +1,4 @@
-package tenksteps.activities;
+package tenksteps.eventstats;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -33,7 +33,7 @@ public class EventsVerticle extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-    eventConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumerOffsetEarliest("activity-service"));
+    eventConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("activity-service"));
     updateProducer = KafkaProducer.create(vertx, KafkaConfig.producer());
     pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
 
