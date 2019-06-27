@@ -71,6 +71,7 @@ class EventStatsTest {
   }
 
   @Test
+  @DisplayName("Incoming activity throughput computation")
   void throughput(VertxTestContext testContext) {
     for (int i = 0; i < 10; i++) {
       producer.send(incomingStepsRecord("abc", (long) i, 10));
