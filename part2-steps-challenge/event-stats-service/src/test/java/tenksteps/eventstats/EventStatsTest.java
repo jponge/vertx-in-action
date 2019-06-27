@@ -8,7 +8,6 @@ import io.vertx.reactivex.kafka.admin.KafkaAdminClient;
 import io.vertx.reactivex.kafka.client.consumer.KafkaConsumer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducer;
 import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
-import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Offset.offset;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(VertxExtension.class)
 @Testcontainers
@@ -46,6 +44,8 @@ class EventStatsTest {
       .rxDeleteTopics(Arrays.asList("incoming.steps", "daily.step.updates"))
       .onErrorComplete()
       .andThen(vertx.rxDeployVerticle(new EventStatsVerticle()))
+      .ignoreElement()
+      .andThen(vertx.rxDeployVerticle(new FakeUserService()))
       .ignoreElement()
       .subscribe(testContext::completeNow, testContext::failNow);
   }
@@ -85,6 +85,26 @@ class EventStatsTest {
           assertThat(data.getInteger("seconds")).isEqualTo(5);
           assertThat(data.getInteger("count")).isEqualTo(10);
           assertThat(data.getDouble("throughput")).isCloseTo(2.0d, offset(0.01d));
+          testContext.completeNow();
+        }), testContext::failNow);
+  }
+
+  @Test
+  @DisplayName("User activity updates")
+  void userActivityUpdate(VertxTestContext testContext) {
+    producer.send(dailyStepsUpdateRecord("abc", 2500));
+    consumer
+      .subscribe("event-stats.user-activity.updates")
+      .toFlowable()
+      .subscribe(
+        record -> testContext.verify(() -> {
+          JsonObject data = record.value();
+          assertThat(data.getString("deviceId")).isEqualTo("abc");
+          assertThat(data.getString("username")).isEqualTo("Foo");
+          assertThat(data.getInteger("stepsCount")).isEqualTo(2500);
+          assertThat(data.containsKey("timestamp")).isTrue();
+          assertThat(data.containsKey("city")).isTrue();
+          assertThat(data.containsKey("makePublic")).isTrue();
           testContext.completeNow();
         }), testContext::failNow);
   }
