@@ -108,4 +108,23 @@ class EventStatsTest {
           testContext.completeNow();
         }), testContext::failNow);
   }
+
+  @Test
+  @DisplayName("City trend updates")
+  void cityTrendUpdate(VertxTestContext testContext) {
+    producer.send(dailyStepsUpdateRecord("abc", 2500));
+    producer.send(dailyStepsUpdateRecord("abc", 2500));
+    consumer
+      .subscribe("event-stats.city-trend.updates")
+      .toFlowable()
+      .subscribe(
+        record -> testContext.verify(() -> {
+          JsonObject data = record.value();
+          assertThat(data.getInteger("seconds")).isEqualTo(5);
+          assertThat(data.getInteger("updates")).isEqualTo(2);
+          assertThat(data.getLong("stepsCount")).isEqualTo(5000L);
+          assertThat(data.getString("city")).isEqualTo("Lyon");
+          testContext.completeNow();
+        }), testContext::failNow);
+  }
 }

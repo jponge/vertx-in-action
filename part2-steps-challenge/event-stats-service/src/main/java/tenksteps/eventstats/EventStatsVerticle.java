@@ -1,6 +1,9 @@
 package tenksteps.eventstats;
 
-import io.reactivex.*;
+import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
+import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
@@ -26,6 +29,7 @@ public class EventStatsVerticle extends AbstractVerticle {
   private KafkaProducer<String, JsonObject> producer;
   private KafkaConsumer<String, JsonObject> throughputConsumer;
   private KafkaConsumer<String, JsonObject> userActivityConsumer;
+  private KafkaConsumer<String, JsonObject> cityTrendConsumer;
 
   @Override
   public Completable rxStart() {
@@ -33,6 +37,7 @@ public class EventStatsVerticle extends AbstractVerticle {
     producer = KafkaProducer.create(vertx, KafkaConfig.producer());
     throughputConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-throughput"));
     userActivityConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-user-activity-updates"));
+    cityTrendConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-city-trends"));
 
     throughputConsumer
       .subscribe("incoming.steps")
@@ -53,7 +58,38 @@ public class EventStatsVerticle extends AbstractVerticle {
       .retryWhen(this::retryLater)
       .subscribe();
 
+    cityTrendConsumer
+      .subscribe("event-stats.user-activity.updates")
+      .toFlowable()
+      .groupBy(this::city)
+      .flatMap(groupedFlowable -> groupedFlowable.buffer(5, TimeUnit.SECONDS, RxHelper.scheduler(vertx)))
+      .flatMapCompletable(this::publishCityTrendUpdate)
+      .doOnError(err -> logger.error("Woops", err))
+      .retryWhen(this::retryLater)
+      .subscribe();
+
     return Completable.complete();
+  }
+
+  private CompletableSource publishCityTrendUpdate(List<KafkaConsumerRecord<String, JsonObject>> records) {
+    if (records.size() > 0) {
+      String city = city(records.get(0));
+      Long stepsCount = records.stream()
+        .map(record -> record.value().getLong("stepsCount"))
+        .reduce(0L, Long::sum);
+      KafkaProducerRecord<String, JsonObject> record = KafkaProducerRecord.create("event-stats.city-trend.updates", city, new JsonObject()
+        .put("seconds", 5)
+        .put("city", city)
+        .put("stepsCount", stepsCount)
+        .put("updates", records.size()));
+      return producer.rxWrite(record);
+    } else {
+      return Completable.complete();
+    }
+  }
+
+  private String city(KafkaConsumerRecord<String, JsonObject> record) {
+    return record.value().getString("city");
   }
 
   private CompletableSource publishThroughput(List<KafkaConsumerRecord<String, JsonObject>> records) {
