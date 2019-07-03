@@ -1,5 +1,6 @@
 .gradle
 build
 user-webapp/src/main/resources/webroot/
+dashboard-webapp/src/main/resources/webroot/
 .ruby-version
 
