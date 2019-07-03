@@ -26,7 +26,7 @@ dependencies {
 }
 
 application {
-  mainClassName = "tenksteps.userprofiles.UserProfileApiVerticle"
+  mainClassName = "tenksteps.publicapi.PublicApiVerticle"
 }
 
 tasks.test {

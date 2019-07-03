@@ -27,7 +27,7 @@ dependencies {
 }
 
 application {
-  mainClassName = "tenksteps.ingester.Main"
+  mainClassName = "tenksteps.ingester.IngesterVerticle"
 }
 
 tasks.test {

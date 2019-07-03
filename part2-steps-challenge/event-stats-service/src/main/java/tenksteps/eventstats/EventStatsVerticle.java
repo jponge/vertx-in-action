@@ -7,6 +7,7 @@ import io.reactivex.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
+import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.web.client.HttpResponse;
 import io.vertx.reactivex.ext.web.client.WebClient;
 import io.vertx.reactivex.ext.web.codec.BodyCodec;
@@ -128,5 +129,14 @@ public class EventStatsVerticle extends AbstractVerticle {
   private Flowable<Long> retryLater(Flowable<Throwable> errs) {
     return errs
       .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  }
+
+  public static void main(String[] args) {
+    System.setProperty("vertx.logger-delegate-factory-class-name", "io.vertx.core.logging.SLF4JLogDelegateFactory");
+    Vertx vertx = Vertx.vertx();
+    vertx.rxDeployVerticle(new EventStatsVerticle())
+      .subscribe(
+        ok -> logger.info("Started"),
+        err -> logger.error("Woops", err));
   }
 }
