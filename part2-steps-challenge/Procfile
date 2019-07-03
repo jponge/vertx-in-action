@@ -1,0 +1,13 @@
+activity-service: java -jar activity-service/build/libs/activity-service-all.jar
+
+congrats-service: java -jar congrats-service/build/libs/congrats-service-all.jar
+
+event-stats-service: java -jar event-stats-service/build/libs/event-stats-service-all.jar
+
+ingestion-service: java -jar ingestion-service/build/libs/ingestion-service-all.jar
+
+public-api: cd public-api && java -jar build/libs/public-api-all.jar
+
+user-profile-service: java -jar user-profile-service/build/libs/user-profile-service-all.jar
+
+user-webapp: java -jar user-webapp/build/libs/user-webapp-all.jar
