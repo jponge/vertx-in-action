@@ -26,7 +26,12 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
     KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumerConfig("dashboard-webapp-throughput"))
       .subscribe("event-stats.throughput")
       .toFlowable()
-      .subscribe(record -> this.forward(record, "client.updates.throughput"));
+      .subscribe(record -> forward(record, "client.updates.throughput"));
+
+    KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumerConfig("dashboard-webapp-city-trend"))
+      .subscribe("event-stats.city-trend.updates")
+      .toFlowable()
+      .subscribe(record -> forward(record, "client.updates.city-trend"));
 
     SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
     BridgeOptions bridgeOptions = new BridgeOptions()
