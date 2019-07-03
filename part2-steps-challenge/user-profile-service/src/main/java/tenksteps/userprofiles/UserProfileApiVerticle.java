@@ -86,7 +86,7 @@ public class UserProfileApiVerticle extends AbstractVerticle {
       body.containsKey("makePublic"));
   }
 
-  private final Pattern validUsername = Pattern.compile("\\w+");
+  private final Pattern validUsername = Pattern.compile("\\w[\\w+|-]*");
   private final Pattern validDeviceId = Pattern.compile("\\w[\\w+|-]*");
 
   // Email regexp from https://www.owasp.org/index.php/OWASP_Validation_Regex_Repository
