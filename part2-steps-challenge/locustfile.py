@@ -17,11 +17,13 @@ SEQ = seq()
 
 def cities():
   names = [
-    "Lyon",
     "Tassin La Demi Lune",
-    "Nevers",
+    "Lyon",
+    "Sydney",
+    "Aubiere",
     "Clermont-Ferrand",
-    "Sydney"
+    "Nevers",
+    "Garchizy"
   ]
   return cycle(names)
 

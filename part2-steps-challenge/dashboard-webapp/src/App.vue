@@ -10,7 +10,7 @@
     <div class="row mt-5">
       <div class="col">
         <h4>Trends</h4>
-        <table class="table table-sm">
+        <table class="table table-sm table-hover">
           <thead>
           <tr>
             <th scope="col">City</th>
