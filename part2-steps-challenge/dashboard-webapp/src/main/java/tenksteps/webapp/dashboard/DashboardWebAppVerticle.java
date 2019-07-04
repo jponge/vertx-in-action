@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -75,20 +72,12 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
   }
 
   private void updatePublicRanking(List<KafkaConsumerRecord<String, JsonObject>> records) {
-    for (KafkaConsumerRecord<String, JsonObject> record : records) {
-      JsonObject json = record.value();
-      // TODO keep only highest score (allows 24h rollover)
-      publicRanking.put(json.getString("username"), json);
-    }
-    Instant now = Instant.now();
-    Iterator<Map.Entry<String, JsonObject>> iterator = publicRanking.entrySet().iterator();
-    while (iterator.hasNext()) {
-      Map.Entry<String, JsonObject> entry = iterator.next();
-      Instant timestamp = Instant.parse(entry.getValue().getString("timestamp"));
-      if (timestamp.until(now, ChronoUnit.DAYS) >= 1L) {
-        iterator.remove();
-      }
-    }
+    copyBetterScores(records);
+    pruneOldEntries();
+    vertx.eventBus().publish("client.updates.publicRanking", computeRanking());
+  }
+
+  private JsonArray computeRanking() {
     List<JsonObject> ranking = publicRanking.entrySet()
       .stream()
       .map(Map.Entry::getValue)
@@ -98,8 +87,30 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
         .put("stepsCount", json.getLong("stepsCount"))
         .put("city", json.getString("city")))
       .collect(Collectors.toList());
-    JsonArray array = new JsonArray(ranking);
-    vertx.eventBus().publish("client.updates.publicRanking", array);
+    return new JsonArray(ranking);
+  }
+
+  private void pruneOldEntries() {
+    Instant now = Instant.now();
+    Iterator<Map.Entry<String, JsonObject>> iterator = publicRanking.entrySet().iterator();
+    while (iterator.hasNext()) {
+      Map.Entry<String, JsonObject> entry = iterator.next();
+      Instant timestamp = Instant.parse(entry.getValue().getString("timestamp"));
+      if (timestamp.until(now, ChronoUnit.DAYS) >= 1L) {
+        iterator.remove();
+      }
+    }
+  }
+
+  private void copyBetterScores(List<KafkaConsumerRecord<String, JsonObject>> records) {
+    for (KafkaConsumerRecord<String, JsonObject> record : records) {
+      JsonObject json = record.value();
+      long stepsCount = json.getLong("stepsCount");
+      JsonObject previousData = publicRanking.get(json.getString("username"));
+      if (previousData == null || previousData.getLong("stepsCount") < stepsCount) {
+        publicRanking.put(json.getString("username"), json);
+      }
+    }
   }
 
   private int compareStepsCountInReverseOrder(JsonObject a, JsonObject b) {
