@@ -18,7 +18,7 @@ dependencies {
   }
 }
 application {
-  mainClassName = "TBA"
+  mainClassName = "tenksteps.webapp.dashboard.DashboardWebAppVerticle"
 }
 
 tasks.register<YarnTask>("buildVueApp") {

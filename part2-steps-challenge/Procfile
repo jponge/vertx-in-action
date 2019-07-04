@@ -11,3 +11,5 @@ public-api: cd public-api && java -jar build/libs/public-api-all.jar
 user-profile-service: java -jar user-profile-service/build/libs/user-profile-service-all.jar
 
 user-webapp: java -jar user-webapp/build/libs/user-webapp-all.jar
+
+dashboard-webapp: java -jar dashboard-webapp/build/libs/dashboard-webapp-all.jar
