@@ -15,7 +15,7 @@
         </li>
       </ul>
     </div>
-    <div>
+    <div class="mt-5">
       <h5>Update your details</h5>
       <form v-on:submit="sendUpdate">
         <div class="form-group">

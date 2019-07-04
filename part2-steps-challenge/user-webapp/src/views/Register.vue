@@ -44,6 +44,7 @@
         email: '',
         deviceId: '',
         city: '',
+        password: '',
         makePublic: true
       }
     },
