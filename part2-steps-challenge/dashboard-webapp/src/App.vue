@@ -26,6 +26,27 @@
         </table>
       </div>
     </div>
+    <div class="row mt-5">
+      <div class="col">
+        <h4>Public ranking (last 24 hours)</h4>
+        <table class="table table-sm table-hover">
+          <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">From</th>
+            <th scope="col">Steps</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr v-for="item in publicRanking" v-bind:key="item.username">
+            <td scope="row">{{ item.username }}</td>
+            <td>{{ item.city }}</td>
+            <td>{{ item.stepsCount }}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -39,7 +60,8 @@
     data() {
       return {
         throughput: 0,
-        cityTrendData: {}
+        cityTrendData: {},
+        publicRanking: []
       }
     },
     mounted() {
@@ -49,6 +71,9 @@
         })
         eventBus.registerHandler("client.updates.city-trend", (err, message) => {
           this.$set(this.cityTrendData, message.body.city, message.body)
+        })
+        eventBus.registerHandler("client.updates.publicRanking", (err, message) => {
+          this.publicRanking = message.body
         })
       }
     },
