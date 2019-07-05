@@ -60,11 +60,6 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
     router.get("/").handler(ctx -> ctx.reroute("/index.html"));
     router.route().handler(StaticHandler.create("webroot/assets"));
 
-    publicRanking.put("Didier", new JsonObject()
-      .put("username", "Didier")
-      .put("stepsCount", 5)
-      .put("timestamp", Instant.EPOCH));
-
     return vertx.createHttpServer()
       .requestHandler(router)
       .rxListen(HTTP_PORT)
