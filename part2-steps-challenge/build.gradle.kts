@@ -13,12 +13,12 @@ subprojects {
     }
   }
 
-  extra["vertxVersion"] = "3.8.0-SNAPSHOT"
-  extra["junit5Version"] = "5.5.0"
-  extra["restAssuredVersion"] = "4.0.0"
-  extra["logbackClassicVersion"] = "1.2.3"
-  extra["assertjVersion"] = "3.12.2"
-  extra["testContainersVersion"] = "1.11.3"
+  project.project.extra["vertxVersion"] = "3.8.0-SNAPSHOT"
+  project.project.extra["junit5Version"] = "5.5.0"
+  project.project.extra["restAssuredVersion"] = "4.0.0"
+  project.project.extra["logbackClassicVersion"] = "1.2.3"
+  project.project.extra["assertjVersion"] = "3.12.2"
+  project.project.extra["testContainersVersion"] = "1.11.3"
 
   apply(plugin = "java")
   apply(plugin = "application")
@@ -33,5 +33,5 @@ subprojects {
 
 tasks.wrapper {
   distributionType = Wrapper.DistributionType.ALL
-  gradleVersion = "5.4.1"
+  gradleVersion = "5.5"
 }

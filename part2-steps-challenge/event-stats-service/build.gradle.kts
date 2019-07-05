@@ -1,9 +1,9 @@
 dependencies {
-  val vertxVersion = extra["vertxVersion"]
-  val junit5Version = extra["junit5Version"]
-  val logbackClassicVersion = extra["logbackClassicVersion"]
-  val assertjVersion = extra["assertjVersion"]
-  val testContainersVersion = extra["testContainersVersion"]
+  val vertxVersion = project.extra["vertxVersion"]
+  val junit5Version = project.extra["junit5Version"]
+  val logbackClassicVersion = project.extra["logbackClassicVersion"]
+  val assertjVersion = project.extra["assertjVersion"]
+  val testContainersVersion = project.extra["testContainersVersion"]
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
   implementation("io.vertx:vertx-web-client:$vertxVersion")

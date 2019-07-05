@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-  val vertxVersion = extra["vertxVersion"]
-  val logbackClassicVersion = extra["logbackClassicVersion"]
+  val vertxVersion = project.extra["vertxVersion"]
+  val logbackClassicVersion = project.extra["logbackClassicVersion"]
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
   implementation("io.vertx:vertx-web:$vertxVersion")
