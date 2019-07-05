@@ -28,19 +28,13 @@ public class EventStatsVerticle extends AbstractVerticle {
   private WebClient webClient;
 
   private KafkaProducer<String, JsonObject> producer;
-  private KafkaConsumer<String, JsonObject> throughputConsumer;
-  private KafkaConsumer<String, JsonObject> userActivityConsumer;
-  private KafkaConsumer<String, JsonObject> cityTrendConsumer;
 
   @Override
   public Completable rxStart() {
     webClient = WebClient.create(vertx);
     producer = KafkaProducer.create(vertx, KafkaConfig.producer());
-    throughputConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-throughput"));
-    userActivityConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-user-activity-updates"));
-    cityTrendConsumer = KafkaConsumer.create(vertx, KafkaConfig.consumer("event-stats-city-trends"));
 
-    throughputConsumer
+    KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumer("event-stats-throughput"))
       .subscribe("incoming.steps")
       .toFlowable()
       .buffer(5, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
@@ -49,7 +43,7 @@ public class EventStatsVerticle extends AbstractVerticle {
       .retryWhen(this::retryLater)
       .subscribe();
 
-    userActivityConsumer
+    KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumer("event-stats-user-activity-updates"))
       .subscribe("daily.step.updates")
       .toFlowable()
       .flatMapSingle(this::addDeviceOwner)
@@ -59,7 +53,7 @@ public class EventStatsVerticle extends AbstractVerticle {
       .retryWhen(this::retryLater)
       .subscribe();
 
-    cityTrendConsumer
+    KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumer("event-stats-city-trends"))
       .subscribe("event-stats.user-activity.updates")
       .toFlowable()
       .groupBy(this::city)

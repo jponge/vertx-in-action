@@ -24,7 +24,6 @@ public class CongratsVerticle extends AbstractVerticle {
 
   private static final Logger logger = LoggerFactory.getLogger(CongratsVerticle.class);
 
-  private KafkaConsumer<String, JsonObject> consumer;
   private MailClient mailClient;
   private WebClient webClient;
 
@@ -32,9 +31,9 @@ public class CongratsVerticle extends AbstractVerticle {
   public Completable rxStart() {
     mailClient = MailClient.createShared(vertx, MailerConfig.config());
     webClient = WebClient.create(vertx);
-    consumer = KafkaConsumer.create(vertx, KafkaConfig.consumerConfig("congrats-service"));
 
-    consumer.subscribe("daily.step.updates")
+    KafkaConsumer.<String, JsonObject>create(vertx, KafkaConfig.consumerConfig("congrats-service"))
+      .subscribe("daily.step.updates")
       .toFlowable()
       .filter(this::above10k)
       .distinct(KafkaConsumerRecord::key)
