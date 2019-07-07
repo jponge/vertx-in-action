@@ -20,7 +20,12 @@
           <tbody>
           <tr v-for="item in cityTrendRanking" v-bind:key="item.city">
             <td scope="row">{{ item.city }}</td>
-            <td>+{{ item.stepsCount }}</td>
+            <td>
+              +{{ item.stepsCount }}
+              <span class="text-secondary font-weight-lighter">
+                ({{ item.moment.format("ddd	hh:mm:ss") }})
+              </span>
+            </td>
           </tr>
           </tbody>
         </table>
@@ -52,6 +57,7 @@
 
 <script>
   import EventBus from 'vertx3-eventbus-client'
+  import moment from 'moment'
 
   const eventBus = new EventBus("/eventbus")
   eventBus.enableReconnect(true)
@@ -70,7 +76,9 @@
           this.throughput = message.body.throughput
         })
         eventBus.registerHandler("client.updates.city-trend", (err, message) => {
-          this.$set(this.cityTrendData, message.body.city, message.body)
+          const data = message.body
+          data.moment = moment(data.timestamp)
+          this.$set(this.cityTrendData, message.body.city, data)
         })
         eventBus.registerHandler("client.updates.publicRanking", (err, message) => {
           this.publicRanking = message.body

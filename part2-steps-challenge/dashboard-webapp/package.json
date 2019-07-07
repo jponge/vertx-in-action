@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "core-js": "^2.6.5",
+    "moment": "^2.24.0",
     "vertx3-eventbus-client": "^3.7.1",
     "vue": "^2.6.10"
   },

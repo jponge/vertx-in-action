@@ -18,6 +18,7 @@ import io.vertx.reactivex.kafka.client.producer.KafkaProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -73,6 +74,7 @@ public class EventStatsVerticle extends AbstractVerticle {
         .map(record -> record.value().getLong("stepsCount"))
         .reduce(0L, Long::sum);
       KafkaProducerRecord<String, JsonObject> record = KafkaProducerRecord.create("event-stats.city-trend.updates", city, new JsonObject()
+        .put("timestamp", LocalDateTime.now().toString())
         .put("seconds", 5)
         .put("city", city)
         .put("stepsCount", stepsCount)
