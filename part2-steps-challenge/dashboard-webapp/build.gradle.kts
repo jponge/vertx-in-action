@@ -10,6 +10,7 @@ dependencies {
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
   implementation("io.vertx:vertx-web:$vertxVersion")
+  implementation("io.vertx:vertx-web-client:$vertxVersion")
   implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
   implementation("io.vertx:vertx-kafka-client:$vertxVersion") {
