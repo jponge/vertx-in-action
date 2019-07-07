@@ -53,7 +53,12 @@ class UserWithDevice(TaskSet):
       "makePublic": self.makePublic
     })
     headers = {"Content-Type": "application/json"}
-    self.client.post("http://localhost:4000/api/v1/register", headers=headers, data=data)
+    with self.client.post("http://localhost:4000/api/v1/register", headers=headers, data=data, catch_response=True) as response:
+      if response.status_code != 200:
+        self.interrupt()
+        response.failure("Registration failed with data %s" % data)
+      else:
+        response.success()
 
   def fetch_token(self):
     data = json.dumps({
