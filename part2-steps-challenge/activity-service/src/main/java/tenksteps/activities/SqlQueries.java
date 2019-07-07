@@ -28,4 +28,10 @@ interface SqlQueries {
       "(device_id = $1) AND" +
       "(date_trunc('day', sync_timestamp) = $2::timestamp)";
   }
+
+  static String rankingLast24Hours() {
+    return "SELECT device_id, SUM(steps_count) as steps FROM stepevent WHERE" +
+      "(now() - sync_timestamp <= (interval '24 hours'))" +
+      "GROUP BY device_id ORDER BY steps DESC";
+  }
 }

@@ -1,12 +1,14 @@
 package tenksteps.activities;
 
 import io.reactivex.Completable;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.reactivex.sqlclient.Row;
+import io.vertx.reactivex.sqlclient.RowSet;
 import io.vertx.reactivex.sqlclient.Tuple;
 import io.vertx.sqlclient.PoolOptions;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ public class ActivityApiVerticle extends AbstractVerticle {
     router.get("/:deviceId/total").handler(this::totalSteps);
     router.get("/:deviceId/:year/:month").handler(this::stepsOnMonth);
     router.get("/:deviceId/:year/:month/:day").handler(this::stepsOnDay);
+    router.get("/ranking-last-24-hours").handler(this::ranking);
 
     return vertx.createHttpServer()
       .requestHandler(router)
@@ -107,5 +110,24 @@ public class ActivityApiVerticle extends AbstractVerticle {
     } catch (DateTimeException | NumberFormatException e) {
       sendBadRequest(ctx);
     }
+  }
+
+  private void ranking(RoutingContext ctx) {
+    pgPool.rxPreparedQuery(SqlQueries.rankingLast24Hours())
+      .subscribe(
+        rows -> sendRanking(ctx, rows),
+        err -> handleError(ctx, err));
+  }
+
+  private void sendRanking(RoutingContext ctx, RowSet rows) {
+    JsonArray data = new JsonArray();
+    for (Row row : rows) {
+      data.add(new JsonObject()
+        .put("deviceId", row.getValue("device_id"))
+        .put("stepsCount", row.getValue("steps")));
+    }
+    ctx.response()
+      .putHeader("Content-Type", "application/json")
+      .end(data.encode());
   }
 }

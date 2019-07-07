@@ -24,7 +24,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -52,12 +54,17 @@ public class ApiTest {
   @BeforeEach
   void prepareDb(Vertx vertx, VertxTestContext testContext) {
     String insertQuery = "INSERT INTO stepevent VALUES($1, $2, $3::timestamp, $4)";
+    LocalDateTime now = LocalDateTime.now();
     List<Tuple> data = Arrays.asList(
       Tuple.of("123", 1, LocalDateTime.of(2019, 4, 1, 23, 0), 6541),
       Tuple.of("123", 2, LocalDateTime.of(2019, 5, 20, 10, 0), 200),
       Tuple.of("123", 3, LocalDateTime.of(2019, 5, 21, 10, 10), 100),
       Tuple.of("456", 1, LocalDateTime.of(2019, 5, 21, 10, 15), 123),
-      Tuple.of("123", 4, LocalDateTime.of(2019, 5, 21, 11, 0), 320)
+      Tuple.of("123", 4, LocalDateTime.of(2019, 5, 21, 11, 0), 320),
+      Tuple.of("abc", 1, now.minus(1, ChronoUnit.HOURS), 1000),
+      Tuple.of("def", 1, now.minus(2, ChronoUnit.HOURS), 100),
+      Tuple.of("def", 2, now.minus(30, ChronoUnit.MINUTES), 900),
+      Tuple.of("abc", 2, now, 1500)
     );
     PgPool pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
 
@@ -180,5 +187,27 @@ public class ApiTest {
       .then()
       .assertThat()
       .statusCode(400);
+  }
+
+  @Test
+  @DisplayName("Fetch the ranking over the last 24 hours")
+  void checkRanking24Hours() {
+    JsonPath jsonPath = given()
+      .spec(requestSpecification)
+      .accept(ContentType.JSON)
+      .get("/ranking-last-24-hours")
+      .then()
+      .assertThat()
+      .statusCode(200)
+      .extract()
+      .jsonPath();
+    List<HashMap<String, Object>> data = jsonPath.getList("$");
+    assertThat(data.size()).isEqualTo(2);
+    assertThat(data.get(0))
+      .containsEntry("deviceId", "abc")
+      .containsEntry("stepsCount", 2500);
+    assertThat(data.get(1))
+      .containsEntry("deviceId", "def")
+      .containsEntry("stepsCount", 1000);
   }
 }
