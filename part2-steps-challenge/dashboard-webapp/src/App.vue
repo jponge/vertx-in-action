@@ -17,17 +17,17 @@
             <th scope="col">Steps</th>
           </tr>
           </thead>
-          <tbody>
-          <tr v-for="item in cityTrendRanking" v-bind:key="item.city">
-            <td scope="row">{{ item.city }}</td>
-            <td>
-              +{{ item.stepsCount }}
-              <span class="text-secondary font-weight-lighter">
+          <transition-group name="city-trends" tag="tbody">
+            <tr v-for="item in cityTrendRanking" v-bind:key="item.city">
+              <td scope="row">{{ item.city }}</td>
+              <td>
+                +{{ item.stepsCount }}
+                <span class="text-secondary font-weight-lighter">
                 ({{ item.moment.format("ddd	hh:mm:ss") }})
-              </span>
-            </td>
-          </tr>
-          </tbody>
+                </span>
+              </td>
+            </tr>
+          </transition-group>
         </table>
       </div>
     </div>
@@ -42,18 +42,24 @@
             <th scope="col">Steps</th>
           </tr>
           </thead>
-          <tbody>
+          <transition-group name="public-ranking" tag="tbody">
           <tr v-for="item in publicRanking" v-bind:key="item.username">
             <td scope="row">{{ item.username }}</td>
             <td>{{ item.city }}</td>
             <td>{{ item.stepsCount }}</td>
           </tr>
-          </tbody>
+          </transition-group>
         </table>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+  .city-trends-move, .public-ranking-move {
+    transition: transform 0.5s;
+  }
+</style>
 
 <script>
   import EventBus from 'vertx3-eventbus-client'
