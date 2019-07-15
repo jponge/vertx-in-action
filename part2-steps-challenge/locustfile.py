@@ -37,10 +37,10 @@ class UserWithDevice(TaskSet):
 
   def on_start(self):
     n = next(SEQ)
-    self.username = "locust-user-%s-%s" % (ID, n)
-    self.password = "abc_123!%s" % n
-    self.email = "locust-user-%s-%s@mail.tld" % (ID, n)
-    self.deviceId = "podometer-%s-%s-%s" % (n, n*2, ID)
+    self.username = f"locust-user-{ID}-{n}"
+    self.password = f"abc_123!{n}"
+    self.email = f"locust-user-{ID}-{n}@mail.tld"
+    self.deviceId = f"podometer-{n}-{n*2}-{ID}"
     self.city = next(CITIES)
     self.makePublic = (n % 2) is 0
     self.deviceSync = 0
@@ -59,8 +59,7 @@ class UserWithDevice(TaskSet):
     headers = {"Content-Type": "application/json"}
     with self.client.post("http://localhost:4000/api/v1/register", headers=headers, data=data, name="Register", catch_response=True) as response:
       if response.status_code != 200:
-        self.interrupt()
-        response.failure("Registration failed with data %s" % data)
+        response.failure(f"Registration failed with data {data}")
         raise StopLocust()
 
   def fetch_token(self):
@@ -87,22 +86,21 @@ class UserWithDevice(TaskSet):
 
   @task(1)
   def my_profile_data(self):
-    headers = {"Authorization": "Bearer %s" % self.token}
-    self.client.get("http://localhost:4000/api/v1/%s" % self.username, headers=headers, name="Fetch profile data")
+    headers = {"Authorization": f"Bearer {self.token}"}
+    self.client.get(f"http://localhost:4000/api/v1/{self.username}", headers=headers, name="Fetch profile data")
 
   @task(1)
   def how_many_total_steps(self):
-    headers = {"Authorization": "Bearer %s" % self.token}
-    with self.client.get("http://localhost:4000/api/v1/%s/total" % self.username, headers=headers, name="Fetch total steps", catch_response=True) as response:
+    headers = {"Authorization": f"Bearer {self.token}"}
+    with self.client.get(f"http://localhost:4000/api/v1/{self.username}/total", headers=headers, name="Fetch total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
   @task(1)
   def how_many_steps_today(self):
     now = datetime.now()
-    args = (self.username, now.year, now.month, now.day)
-    headers = {"Authorization": "Bearer %s" % self.token}
-    with self.client.get("http://localhost:4000/api/v1/%s/%s/%s/%s" % args, headers=headers, name="Fetch today total steps", catch_response=True) as response:
+    headers = {"Authorization": f"Bearer {self.token}"}
+    with self.client.get(f"http://localhost:4000/api/v1/{self.username}/{now.year}/{now.month}/{now.day}", headers=headers, name="Fetch today total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
