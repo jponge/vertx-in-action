@@ -16,14 +16,14 @@ public class Offload extends AbstractVerticle {
     });
   }
 
-  private void blockingCode(Future<String> future) {
+  private void blockingCode(Promise<String> promise) {
     logger.info("Blocking code running");
     try {
       Thread.sleep(4000);
       logger.info("Done!");
-      future.complete("Ok!");
+      promise.complete("Ok!");
     } catch (InterruptedException e) {
-      future.fail(e);
+      promise.fail(e);
     }
   }
 
