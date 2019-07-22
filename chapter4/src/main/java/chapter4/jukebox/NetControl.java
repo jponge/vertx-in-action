@@ -61,7 +61,7 @@ public class NetControl extends AbstractVerticle {
   }
 
   private void listCommand(NetSocket socket) {
-    vertx.eventBus().send("jukebox.list", "", reply -> {
+    vertx.eventBus().request("jukebox.list", "", reply -> {
       if (reply.succeeded()) {
         JsonObject data = (JsonObject) reply.result().body();
         data.getJsonArray("files")

@@ -7,15 +7,12 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.7.0")
+  implementation("io.vertx:vertx-core:3.8.0")
   implementation("ch.qos.logback:logback-classic:1.2.3")
-  testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
-  testCompile("io.vertx:vertx-junit5:3.7.0")
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }
 
 tasks.create<JavaExec>("run") {
-  main = project.properties.getOrDefault("mainClass", "chapter3.local.Main") as String
+  main = project.properties.getOrDefault("mainClass", "chapter4.jukebox.Main") as String
   classpath = sourceSets["main"].runtimeClasspath
   systemProperties["vertx.logger-delegate-factory-class-name"] = "io.vertx.core.logging.SLF4JLogDelegateFactory"
 }
@@ -29,5 +26,5 @@ java {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.2.1"
+  gradleVersion = "5.5.1"
 }
