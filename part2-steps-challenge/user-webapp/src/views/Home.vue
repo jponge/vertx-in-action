@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="alert alert-danger" role="alert" v-if="alertMessage.length > 0">
+      {{ alertMessage }}
+    </div>
     <div class="float-right">
       <button v-on:click="logout" class="btn btn-outline-danger" type="button">logout</button>
     </div>
@@ -54,7 +57,8 @@
         makePublic: false,
         totalSteps: 0,
         stepsForMonth: 0,
-        stepsForToday: 0
+        stepsForToday: 0,
+        alertMessage: ''
       }
     },
     mounted() {
@@ -84,7 +88,7 @@
             DataStore.setMakePublic(response.data.makePublic)
             this.refreshFromDataStore()
           })
-          .catch(err => console.error(err))
+          .catch(err => this.alertMessage = err.message)
 
         const today = new Date()
 
@@ -99,7 +103,7 @@
             if (err.response.status === 404) {
               this.totalSteps = 0
             } else {
-              console.error(err)
+              this.alertMessage = err.message
             }
           })
 
@@ -114,7 +118,7 @@
             if (err.response.status === 404) {
               this.stepsForMonth = 0
             } else {
-              console.error(err)
+              this.alertMessage = err.message
             }
           })
 
@@ -129,7 +133,7 @@
             if (err.response.status === 404) {
               this.stepsForToday = 0
             } else {
-              console.error(err)
+              this.alertMessage = err.message
             }
           })
       },
@@ -152,9 +156,9 @@
         }
         axios
           .put(`http://localhost:4000/api/v1/${DataStore.username()}`, data, config)
-          .then(response => this.refreshData())
+          .then(() => this.refreshData())
           .catch(err => {
-            console.error(err)
+            this.alertMessage = err.message
             this.refreshFromDataStore()
           })
       }

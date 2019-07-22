@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="alert alert-danger" role="alert" v-if="alertMessage.length > 0">
+      {{ alertMessage }}
+    </div>
     <form v-on:submit="submit">
       <div class="form-group">
         <label for="username">User name</label>
@@ -45,11 +48,12 @@
         deviceId: '',
         city: '',
         password: '',
-        makePublic: true
+        makePublic: true,
+        alertMessage: ''
       }
     },
     methods: {
-      submit: function (event) {
+      submit: function () {
         const payload = {
           username: this.username,
           email: this.email,
@@ -60,8 +64,8 @@
         }
         axios
           .post("http://localhost:4000/api/v1/register", payload)
-          .then(response => this.$router.push('/'))
-          .catch(err => console.error(err))
+          .then(() => this.$router.push('/'))
+          .catch(err => this.alertMessage = err.message)
       }
     }
   }

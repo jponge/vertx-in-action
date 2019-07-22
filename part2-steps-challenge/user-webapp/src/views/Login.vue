@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="alert alert-danger" role="alert" v-if="alertMessage.length > 0">
+      {{ alertMessage }}
+    </div>
     <form v-on:submit="login">
       <div class="form-group">
         <label for="username">User name</label>
@@ -26,10 +29,11 @@
       return {
         username: '',
         password: '',
+        alertMessage: ''
       }
     },
     methods: {
-      login: function (event) {
+      login: function () {
         if (this.username.length === 0 || this.password.length === 0) {
           return
         }
@@ -43,7 +47,7 @@
             DataStore.setUsername(this.username)
             this.$router.push({name: 'home'})
           })
-          .catch(err => console.error(err))
+          .catch(err => this.alertMessage = err.message)
       }
     }
   }
