@@ -21,7 +21,7 @@ class SensorDataTest {
         .put("id", "a").put("temp", 20.0d));
       bus.publish("sensor.updates", new JsonObject()
         .put("id", "b").put("temp", 22.0d));
-      bus.send("sensor.average", "", ctx.succeeding(reply -> ctx.verify(() -> {
+      bus.request("sensor.average", "", ctx.succeeding(reply -> ctx.verify(() -> {
         JsonObject json = (JsonObject) reply.body();
         assertEquals(21.0d, (double) json.getDouble("average"));
         ctx.completeNow();
