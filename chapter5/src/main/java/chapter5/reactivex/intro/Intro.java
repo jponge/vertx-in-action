@@ -3,7 +3,6 @@ package chapter5.reactivex.intro;
 import io.reactivex.Flowable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
 
 import java.util.concurrent.TimeUnit;
 
