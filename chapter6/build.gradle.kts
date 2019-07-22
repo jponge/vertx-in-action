@@ -8,21 +8,21 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.6.3")
-  implementation("io.vertx:vertx-codegen:3.6.3")
-  implementation("io.vertx:vertx-service-proxy:3.6.3")
+  implementation("io.vertx:vertx-core:3.8.0")
+  implementation("io.vertx:vertx-codegen:3.8.0")
+  implementation("io.vertx:vertx-service-proxy:3.8.0")
 
-  annotationProcessor("io.vertx:vertx-service-proxy:3.6.3")
-  annotationProcessor("io.vertx:vertx-codegen:3.6.3:processor")
+  annotationProcessor("io.vertx:vertx-service-proxy:3.8.0")
+  annotationProcessor("io.vertx:vertx-codegen:3.8.0:processor")
 
-  implementation("io.vertx:vertx-rx-java2:3.6.3")
-  annotationProcessor("io.vertx:vertx-rx-java2-gen:3.6.3")
+  implementation("io.vertx:vertx-rx-java2:3.8.0")
+  annotationProcessor("io.vertx:vertx-rx-java2-gen:3.8.0")
 
-  testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
-  testCompile("io.vertx:vertx-junit5:3.6.3")
+  testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
+  testCompile("io.vertx:vertx-junit5:3.8.0")
   testCompile("org.assertj:assertj-core:3.11.1")
 
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 
 tasks.named<Test>("test") {
@@ -42,5 +42,5 @@ application {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.2.1"
+  gradleVersion = "5.5.1"
 }
