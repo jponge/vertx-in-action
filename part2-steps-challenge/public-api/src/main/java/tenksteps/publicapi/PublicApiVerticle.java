@@ -104,7 +104,7 @@ public class PublicApiVerticle extends AbstractVerticle {
   private void checkUser(RoutingContext ctx) {
     String subject = ctx.user().principal().getString("sub");
     if (!ctx.pathParam("username").equals(subject)) {
-      ctx.response().setStatusCode(403).end();
+      sendStatusCode(ctx, 403);
     } else {
       ctx.next();
     }
@@ -116,8 +116,12 @@ public class PublicApiVerticle extends AbstractVerticle {
       .putHeader("Content-Type", "application/json")
       .rxSendJson(ctx.getBodyAsJson())
       .subscribe(
-        response -> ctx.response().setStatusCode(response.statusCode()).end(),
+        response -> sendStatusCode(ctx, response.statusCode()),
         err -> sendBadGateway(ctx, err));
+  }
+
+  private void sendStatusCode(RoutingContext ctx, int code) {
+    ctx.response().setStatusCode(code).end();
   }
 
   private void sendBadGateway(RoutingContext ctx, Throwable err) {
@@ -180,7 +184,7 @@ public class PublicApiVerticle extends AbstractVerticle {
 
   private void forwardJsonOrStatusCode(RoutingContext ctx, HttpResponse<JsonObject> resp) {
     if (resp.statusCode() != 200) {
-      ctx.response().setStatusCode(resp.statusCode()).end();
+      sendStatusCode(ctx, resp.statusCode());
     } else {
       ctx.response()
         .putHeader("Content-Type", "application/json")
