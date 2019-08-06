@@ -23,6 +23,7 @@ application {
 }
 
 tasks.register<YarnTask>("buildVueApp") {
+  dependsOn("yarn_install")
   inputs.file("package.json")
   inputs.file("yarn.lock")
   inputs.dir("src")
