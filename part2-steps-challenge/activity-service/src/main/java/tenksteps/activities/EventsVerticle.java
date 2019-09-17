@@ -50,9 +50,8 @@ public class EventsVerticle extends AbstractVerticle {
     return Completable.complete();
   }
 
-  private Flowable<Long> retryLater(Flowable<Throwable> errs) {
-    return errs
-      .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  private Flowable<Throwable> retryLater(Flowable<Throwable> errs) {
+    return errs.delay(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx));
   }
 
   private Flowable<KafkaConsumerRecord<String, JsonObject>> insertRecord(KafkaConsumerRecord<String, JsonObject> record) {

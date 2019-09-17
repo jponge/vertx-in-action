@@ -122,9 +122,8 @@ public class EventStatsVerticle extends AbstractVerticle {
       KafkaProducerRecord.create("event-stats.user-activity.updates", data.getString("username"), data));
   }
 
-  private Flowable<Long> retryLater(Flowable<Throwable> errs) {
-    return errs
-      .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  private Flowable<Throwable> retryLater(Flowable<Throwable> errs) {
+    return errs.delay(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx));
   }
 
   public static void main(String[] args) {

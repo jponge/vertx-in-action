@@ -80,9 +80,8 @@ public class CongratsVerticle extends AbstractVerticle {
     return record.value().getInteger("stepsCount") >= 10_000;
   }
 
-  private Flowable<Long> retryLater(Flowable<Throwable> errs) {
-    return errs
-      .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  private Flowable<Throwable> retryLater(Flowable<Throwable> errs) {
+    return errs.delay(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx));
   }
 
   public static void main(String[] args) {
