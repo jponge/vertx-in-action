@@ -42,8 +42,7 @@ public class IngesterVerticle extends AbstractVerticle {
     AmqpClient.create(vertx, amqpOptions)
       .rxConnect()
       .flatMap(conn -> conn.rxCreateReceiver("step-events", receiverOptions))
-      .toFlowable()
-      .flatMap(AmqpReceiver::toFlowable)
+      .flatMapPublisher(AmqpReceiver::toFlowable)
       .doOnError(this::logAmqpError)
       .retryWhen(this::retryLater)
       .subscribe(this::handleAmqpMessage, this::logAmqpError);
