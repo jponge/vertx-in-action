@@ -45,7 +45,7 @@ public class IngesterVerticle extends AbstractVerticle {
       .flatMapPublisher(AmqpReceiver::toFlowable)
       .doOnError(this::logAmqpError)
       .retryWhen(this::retryLater)
-      .subscribe(this::handleAmqpMessage, this::logAmqpError);
+      .subscribe(this::handleAmqpMessage);
 
     Router router = Router.router(vertx);
     router.post().handler(BodyHandler.create());
@@ -57,9 +57,8 @@ public class IngesterVerticle extends AbstractVerticle {
       .ignoreElement();
   }
 
-  private Flowable<Long> retryLater(Flowable<Throwable> errs) {
-    return errs
-      .flatMap(d -> Flowable.timer(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx)));
+  private Flowable<Throwable> retryLater(Flowable<Throwable> errs) {
+    return errs.delay(10, TimeUnit.SECONDS, RxHelper.scheduler(vertx));
   }
 
   private AmqpClientOptions amqpConfig() {
