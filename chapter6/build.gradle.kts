@@ -8,18 +8,18 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.8.0")
-  implementation("io.vertx:vertx-codegen:3.8.0")
-  implementation("io.vertx:vertx-service-proxy:3.8.0")
+  implementation("io.vertx:vertx-core:4.0.0-milestone3")
+  implementation("io.vertx:vertx-codegen:4.0.0-milestone3")
+  implementation("io.vertx:vertx-service-proxy:4.0.0-milestone3")
 
-  annotationProcessor("io.vertx:vertx-service-proxy:3.8.0")
-  annotationProcessor("io.vertx:vertx-codegen:3.8.0:processor")
+  annotationProcessor("io.vertx:vertx-service-proxy:4.0.0-milestone3")
+  annotationProcessor("io.vertx:vertx-codegen:4.0.0-milestone3:processor")
 
-  implementation("io.vertx:vertx-rx-java2:3.8.0")
-  annotationProcessor("io.vertx:vertx-rx-java2-gen:3.8.0")
+  implementation("io.vertx:vertx-rx-java2:4.0.0-milestone3")
+  annotationProcessor("io.vertx:vertx-rx-java2-gen:4.0.0-milestone3")
 
   testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
-  testCompile("io.vertx:vertx-junit5:3.8.0")
+  testCompile("io.vertx:vertx-junit5:4.0.0-milestone3")
   testCompile("org.assertj:assertj-core:3.11.1")
 
   testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.1")
