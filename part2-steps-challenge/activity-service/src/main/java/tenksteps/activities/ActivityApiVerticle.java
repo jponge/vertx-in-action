@@ -76,8 +76,8 @@ public class ActivityApiVerticle extends AbstractVerticle {
     try {
       String deviceId = ctx.pathParam("deviceId");
       LocalDateTime dateTime = LocalDateTime.of(
-        Integer.valueOf(ctx.pathParam("year")),
-        Integer.valueOf(ctx.pathParam("month")),
+        Integer.parseInt(ctx.pathParam("year")),
+        Integer.parseInt(ctx.pathParam("month")),
         1, 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
       pgPool.rxPreparedQuery(SqlQueries.monthlyStepsCount(), params)
@@ -98,9 +98,9 @@ public class ActivityApiVerticle extends AbstractVerticle {
     try {
       String deviceId = ctx.pathParam("deviceId");
       LocalDateTime dateTime = LocalDateTime.of(
-        Integer.valueOf(ctx.pathParam("year")),
-        Integer.valueOf(ctx.pathParam("month")),
-        Integer.valueOf(ctx.pathParam("day")), 0, 0);
+        Integer.parseInt(ctx.pathParam("year")),
+        Integer.parseInt(ctx.pathParam("month")),
+        Integer.parseInt(ctx.pathParam("day")), 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
       pgPool.rxPreparedQuery(SqlQueries.dailyStepsCount(), params)
         .map(rs -> rs.iterator().next())
@@ -119,7 +119,7 @@ public class ActivityApiVerticle extends AbstractVerticle {
         err -> handleError(ctx, err));
   }
 
-  private void sendRanking(RoutingContext ctx, RowSet rows) {
+  private void sendRanking(RoutingContext ctx, RowSet<Row> rows) {
     JsonArray data = new JsonArray();
     for (Row row : rows) {
       data.add(new JsonObject()
