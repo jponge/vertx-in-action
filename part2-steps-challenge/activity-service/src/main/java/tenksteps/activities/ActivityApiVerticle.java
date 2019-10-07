@@ -119,7 +119,7 @@ public class ActivityApiVerticle extends AbstractVerticle {
         err -> handleError(ctx, err));
   }
 
-  private void sendRanking(RoutingContext ctx, RowSet rows) {
+  private void sendRanking(RoutingContext ctx, RowSet<Row> rows) {
     JsonArray data = new JsonArray();
     for (Row row : rows) {
       data.add(new JsonObject()

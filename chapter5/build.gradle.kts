@@ -10,12 +10,12 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.8.0")
-  implementation("io.vertx:vertx-rx-java2:3.8.0")
-  implementation("io.vertx:vertx-web-client:3.8.0")
+  implementation("io.vertx:vertx-core:3.8.2")
+  implementation("io.vertx:vertx-rx-java2:3.8.2")
+  implementation("io.vertx:vertx-web-client:3.8.2")
 
-  implementation("io.vertx:vertx-lang-kotlin:3.8.0")
-  implementation("io.vertx:vertx-lang-kotlin-coroutines:3.8.0")
+  implementation("io.vertx:vertx-lang-kotlin:3.8.2")
+  implementation("io.vertx:vertx-lang-kotlin-coroutines:3.8.2")
   implementation(kotlin("stdlib-jdk8"))
 
   implementation("ch.qos.logback:logback-classic:1.2.3")
