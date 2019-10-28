@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:3.8.2")
+  implementation("io.vertx:vertx-core:3.8.3")
 }
 
 java {
