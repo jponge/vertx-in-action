@@ -13,7 +13,7 @@ subprojects {
     }
   }
 
-  project.project.extra["vertxVersion"] = "3.8.3"
+  project.project.extra["vertxVersion"] = "3.8.4"
   project.project.extra["junit5Version"] = "5.5.1"
   project.project.extra["restAssuredVersion"] = "4.0.0"
   project.project.extra["logbackClassicVersion"] = "1.2.3"
