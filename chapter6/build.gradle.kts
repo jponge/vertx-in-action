@@ -5,24 +5,27 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven {
+    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+  }
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0-milestone4")
-  implementation("io.vertx:vertx-codegen:4.0.0-milestone4")
-  implementation("io.vertx:vertx-service-proxy:4.0.0-milestone4")
+  implementation("io.vertx:vertx-core:4.0.0-SNAPSHOT")
+  implementation("io.vertx:vertx-codegen:4.0.0-SNAPSHOT")
+  implementation("io.vertx:vertx-service-proxy:4.0.0-SNAPSHOT")
 
-  annotationProcessor("io.vertx:vertx-service-proxy:4.0.0-milestone4")
-  annotationProcessor("io.vertx:vertx-codegen:4.0.0-milestone4:processor")
+  annotationProcessor("io.vertx:vertx-service-proxy:4.0.0-SNAPSHOT")
+  annotationProcessor("io.vertx:vertx-codegen:4.0.0-SNAPSHOT:processor")
 
-  implementation("io.vertx:vertx-rx-java2:4.0.0-milestone4")
-  annotationProcessor("io.vertx:vertx-rx-java2-gen:4.0.0-milestone4")
+  implementation("io.vertx:vertx-rx-java2:4.0.0-SNAPSHOT")
+  annotationProcessor("io.vertx:vertx-rx-java2-gen:4.0.0-SNAPSHOT")
 
-  testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
-  testCompile("io.vertx:vertx-junit5:4.0.0-milestone4")
-  testCompile("org.assertj:assertj-core:3.11.1")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
+  testImplementation("io.vertx:vertx-junit5:4.0.0-SNAPSHOT")
+  testImplementation("org.assertj:assertj-core:3.11.1")
 
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.1")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 
 tasks.named<Test>("test") {
@@ -42,5 +45,5 @@ application {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.5.1"
+  gradleVersion = "6.1.1"
 }

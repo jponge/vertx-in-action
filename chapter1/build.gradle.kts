@@ -5,10 +5,13 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven {
+    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+  }
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0-milestone4")
+  implementation("io.vertx:vertx-core:4.0.0-SNAPSHOT")
 }
 
 java {
@@ -20,5 +23,5 @@ application {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.5.1"
+  gradleVersion = "6.1.1"
 }

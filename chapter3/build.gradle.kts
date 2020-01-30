@@ -4,15 +4,18 @@ plugins {
 
 repositories {
   mavenCentral()
+  maven {
+    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+  }
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0-milestone4")
-  implementation("io.vertx:vertx-infinispan:4.0.0-milestone4")
+  implementation("io.vertx:vertx-core:4.0.0-SNAPSHOT")
+  implementation("io.vertx:vertx-infinispan:4.0.0-SNAPSHOT")
   implementation("ch.qos.logback:logback-classic:1.2.3")
-  testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
-  testCompile("io.vertx:vertx-junit5:4.0.0-milestone4")
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.1")
+  testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.1")
+  testImplementation("io.vertx:vertx-junit5:4.0.0-SNAPSHOT")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 
 tasks.create<JavaExec>("run") {
@@ -30,5 +33,5 @@ java {
 }
 
 tasks.wrapper {
-  gradleVersion = "5.5.1"
+  gradleVersion = "6.1.1"
 }
