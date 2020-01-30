@@ -7,11 +7,11 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0-milestone3")
-  implementation("io.vertx:vertx-infinispan:4.0.0-milestone3")
+  implementation("io.vertx:vertx-core:4.0.0-milestone4")
+  implementation("io.vertx:vertx-infinispan:4.0.0-milestone4")
   implementation("ch.qos.logback:logback-classic:1.2.3")
   testCompile("org.junit.jupiter:junit-jupiter-api:5.5.1")
-  testCompile("io.vertx:vertx-junit5:4.0.0-milestone3")
+  testCompile("io.vertx:vertx-junit5:4.0.0-milestone4")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.1")
 }
 

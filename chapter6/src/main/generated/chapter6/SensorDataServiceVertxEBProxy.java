@@ -56,13 +56,14 @@ public class SensorDataServiceVertxEBProxy implements SensorDataService {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
-    try{
+    try {
       this._vertx.eventBus().registerDefaultCodec(ServiceException.class, new ServiceExceptionMessageCodec());
-    } catch (IllegalStateException ex) {}
+    } catch (IllegalStateException ex) {
+    }
   }
 
   @Override
-  public  void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler){
+  public void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler){
     if (closed) {
       handler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -81,7 +82,7 @@ public class SensorDataServiceVertxEBProxy implements SensorDataService {
     });
   }
   @Override
-  public  void average(Handler<AsyncResult<JsonObject>> handler){
+  public void average(Handler<AsyncResult<JsonObject>> handler){
     if (closed) {
       handler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
