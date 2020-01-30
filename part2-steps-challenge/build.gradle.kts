@@ -13,7 +13,7 @@ subprojects {
     }
   }
 
-  project.project.extra["vertxVersion"] = "4.0.0-milestone4"
+  project.project.extra["vertxVersion"] = "4.0.0-SNAPSHOT"
   project.project.extra["junit5Version"] = "5.5.1"
   project.project.extra["restAssuredVersion"] = "4.0.0"
   project.project.extra["logbackClassicVersion"] = "1.2.3"
@@ -33,5 +33,5 @@ subprojects {
 
 tasks.wrapper {
   distributionType = Wrapper.DistributionType.ALL
-  gradleVersion = "5.6"
+  gradleVersion = "6.1.1"
 }

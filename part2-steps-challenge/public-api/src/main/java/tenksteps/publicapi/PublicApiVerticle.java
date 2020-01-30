@@ -2,13 +2,13 @@ package tenksteps.publicapi;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.PubSecKeyOptions;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.jwt.JWTOptions;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.Vertx;
+import io.vertx.reactivex.core.http.HttpMethod;
 import io.vertx.reactivex.ext.auth.jwt.JWTAuth;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -49,8 +49,10 @@ public class PublicApiVerticle extends AbstractVerticle {
     jwtAuth = JWTAuth.create(vertx, new JWTAuthOptions()
       .addPubSecKey(new PubSecKeyOptions()
         .setAlgorithm("RS256")
-        .setPublicKey(publicKey)
-        .setSecretKey(privateKey)));
+        .setBuffer(publicKey))
+      .addPubSecKey(new PubSecKeyOptions()
+        .setAlgorithm("RS256")
+        .setBuffer(privateKey)));
 
     Router router = Router.router(vertx);
 

@@ -23,7 +23,7 @@ dependencies {
 
   testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
 
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
 }
 
 application {
