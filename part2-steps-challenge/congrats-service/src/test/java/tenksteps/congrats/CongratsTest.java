@@ -62,6 +62,7 @@ class CongratsTest {
       .ignoreElement()
       .andThen(webClient.delete(8025, "localhost", "/api/v1/messages").rxSend())
       .ignoreElement()
+      .delay(1, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 
