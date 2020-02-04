@@ -14,11 +14,6 @@ public class Intro {
 
     Promise<String> promise = Promise.promise();
 
-    Future<String> future = promise.future();
-    future
-      .onSuccess(System.out::println)
-      .onFailure(err -> System.out.println(err.getMessage()));
-
     System.out.println("Waiting...");
     vertx.setTimer(5000, id -> {
       if (System.currentTimeMillis() % 2L == 0L) {
@@ -27,6 +22,11 @@ public class Intro {
         promise.fail(new RuntimeException("Bad luck..."));
       }
     });
+
+    Future<String> future = promise.future();
+    future
+      .onSuccess(System.out::println)
+      .onFailure(err -> System.out.println(err.getMessage()));
 
     promise.future()
       .recover(err -> Future.succeededFuture("Let's say it's ok!"))
