@@ -165,16 +165,9 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
   }
 
   private int compareStepsCountInReverseOrder(JsonObject a, JsonObject b) {
-    // We cannot just subtract due to possible integer overflow
-    long c1 = a.getLong("stepsCount");
-    long c2 = b.getLong("stepsCount");
-    if (c1 < c2) {
-      return 1;
-    } else if (c1 == c2) {
-      return 0;
-    } else {
-      return -1;
-    }
+    Long first = a.getLong("stepsCount");
+    Long second = b.getLong("stepsCount");
+    return second.compareTo(first);
   }
 
   private void forwardKafkaRecord(KafkaConsumerRecord<String, JsonObject> record, String destination) {
