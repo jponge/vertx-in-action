@@ -36,7 +36,6 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
   private static final Logger logger = LoggerFactory.getLogger(DashboardWebAppVerticle.class);
 
   private final HashMap<String, JsonObject> publicRanking = new HashMap<>();
-  private JsonArray latestRanking = new JsonArray();
 
   @Override
   public Completable rxStart() {
@@ -139,8 +138,7 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
         .put("stepsCount", json.getLong("stepsCount"))
         .put("city", json.getString("city")))
       .collect(Collectors.toList());
-    latestRanking = new JsonArray(ranking);
-    return latestRanking;
+    return new JsonArray(ranking);
   }
 
   private void pruneOldEntries() {
