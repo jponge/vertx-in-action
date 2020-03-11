@@ -10,7 +10,6 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.streams.Pump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
