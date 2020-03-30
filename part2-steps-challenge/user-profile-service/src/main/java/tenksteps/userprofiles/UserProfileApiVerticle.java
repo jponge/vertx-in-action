@@ -5,9 +5,12 @@ import io.reactivex.Maybe;
 import io.reactivex.MaybeSource;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.mongo.AuthenticationException;
+import io.vertx.ext.auth.mongo.MongoAuthenticationOptions;
+import io.vertx.ext.auth.mongo.MongoUserUtil;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.ext.auth.mongo.MongoAuth;
+import io.vertx.reactivex.ext.auth.mongo.MongoAuthentication;
 import io.vertx.reactivex.ext.mongo.MongoClient;
 import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
@@ -41,6 +44,8 @@ public class UserProfileApiVerticle extends AbstractVerticle {
 
     JsonObject authConfig = new JsonObject();
     authProvider = MongoAuth.create(mongoClient, authConfig);
+    // authProvider = MongoAuthentication.create(mongoClient, new MongoAuthenticationOptions());
+    // MongoUserUtil
 
     Router router = Router.router(vertx);
     BodyHandler bodyHandler = BodyHandler.create();
