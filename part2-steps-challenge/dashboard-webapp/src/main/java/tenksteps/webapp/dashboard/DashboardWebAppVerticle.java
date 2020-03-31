@@ -6,7 +6,7 @@ import io.reactivex.internal.functions.Functions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.PermittedOptions;
-import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
@@ -61,7 +61,7 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
     hydrate();
 
     SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
-    BridgeOptions bridgeOptions = new BridgeOptions()
+    SockJSBridgeOptions bridgeOptions = new SockJSBridgeOptions()
       .addInboundPermitted(new PermittedOptions().setAddressRegex("client.updates.*"))
       .addOutboundPermitted(new PermittedOptions().setAddressRegex("client.updates.*"));
     sockJSHandler.bridge(bridgeOptions);
