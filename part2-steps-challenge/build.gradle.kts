@@ -7,6 +7,11 @@ plugins {
 subprojects {
 
   repositories {
+//    mavenLocal {
+//      content {
+//        includeGroup("io.vertx")
+//      }
+//    }
     mavenCentral()
     maven {
       url = uri("https://oss.sonatype.org/content/repositories/snapshots")
