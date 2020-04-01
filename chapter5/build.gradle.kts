@@ -28,5 +28,5 @@ val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
 tasks.wrapper {
-  gradleVersion = "6.1.1"
+  gradleVersion = "6.3"
 }

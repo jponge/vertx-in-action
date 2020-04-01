@@ -58,17 +58,21 @@ public class SensorDataService {
     this.delegate = delegate;
   }
 
+  public SensorDataService(Object delegate) {
+    this.delegate = (chapter6.SensorDataService)delegate;
+  }
+
   public chapter6.SensorDataService getDelegate() {
     return delegate;
   }
 
   public static chapter6.reactivex.SensorDataService create(io.vertx.reactivex.core.Vertx vertx) { 
-    chapter6.reactivex.SensorDataService ret = chapter6.reactivex.SensorDataService.newInstance(chapter6.SensorDataService.create(vertx.getDelegate()));
+    chapter6.reactivex.SensorDataService ret = chapter6.reactivex.SensorDataService.newInstance((chapter6.SensorDataService)chapter6.SensorDataService.create(vertx.getDelegate()));
     return ret;
   }
 
   public static chapter6.reactivex.SensorDataService createProxy(io.vertx.reactivex.core.Vertx vertx, String address) { 
-    chapter6.reactivex.SensorDataService ret = chapter6.reactivex.SensorDataService.newInstance(chapter6.SensorDataService.createProxy(vertx.getDelegate(), address));
+    chapter6.reactivex.SensorDataService ret = chapter6.reactivex.SensorDataService.newInstance((chapter6.SensorDataService)chapter6.SensorDataService.createProxy(vertx.getDelegate(), address));
     return ret;
   }
 
@@ -100,8 +104,8 @@ public class SensorDataService {
     });
   }
 
-
-  public static  SensorDataService newInstance(chapter6.SensorDataService arg) {
+  public static SensorDataService newInstance(chapter6.SensorDataService arg) {
     return arg != null ? new SensorDataService(arg) : null;
   }
+
 }
