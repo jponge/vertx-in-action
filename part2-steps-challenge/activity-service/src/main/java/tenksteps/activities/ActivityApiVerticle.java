@@ -43,7 +43,9 @@ public class ActivityApiVerticle extends AbstractVerticle {
   private void totalSteps(RoutingContext ctx) {
     String deviceId = ctx.pathParam("deviceId");
     Tuple params = Tuple.of(deviceId);
-    pgPool.rxPreparedQuery(SqlQueries.totalStepsCount(), params)
+    pgPool
+      .preparedQuery(SqlQueries.totalStepsCount())
+      .rxExecute(params)
       .map(rs -> rs.iterator().next())
       .subscribe(
         row -> sendCount(ctx, row),
@@ -80,7 +82,9 @@ public class ActivityApiVerticle extends AbstractVerticle {
         Integer.parseInt(ctx.pathParam("month")),
         1, 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
-      pgPool.rxPreparedQuery(SqlQueries.monthlyStepsCount(), params)
+      pgPool
+        .preparedQuery(SqlQueries.monthlyStepsCount())
+        .rxExecute(params)
         .map(rs -> rs.iterator().next())
         .subscribe(
           row -> sendCount(ctx, row),
@@ -102,7 +106,9 @@ public class ActivityApiVerticle extends AbstractVerticle {
         Integer.parseInt(ctx.pathParam("month")),
         Integer.parseInt(ctx.pathParam("day")), 0, 0);
       Tuple params = Tuple.of(deviceId, dateTime);
-      pgPool.rxPreparedQuery(SqlQueries.dailyStepsCount(), params)
+      pgPool
+        .preparedQuery(SqlQueries.dailyStepsCount())
+        .rxExecute(params)
         .map(rs -> rs.iterator().next())
         .subscribe(
           row -> sendCount(ctx, row),
@@ -113,7 +119,9 @@ public class ActivityApiVerticle extends AbstractVerticle {
   }
 
   private void ranking(RoutingContext ctx) {
-    pgPool.rxPreparedQuery(SqlQueries.rankingLast24Hours())
+    pgPool
+      .preparedQuery(SqlQueries.rankingLast24Hours())
+      .rxExecute()
       .subscribe(
         rows -> sendRanking(ctx, rows),
         err -> handleError(ctx, err));

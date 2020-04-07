@@ -42,7 +42,8 @@ class EventProcessingTest {
     KafkaAdminClient adminClient = KafkaAdminClient.create(vertx, KafkaConfig.producer());
 
     PgPool pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
-    pgPool.rxQuery("DELETE FROM stepevent")
+    pgPool.query("DELETE FROM stepevent")
+      .rxExecute()
       .flatMapCompletable(rs -> adminClient.rxDeleteTopics(Arrays.asList("incoming.steps", "daily.step.updates")))
       .andThen(Completable.fromAction(pgPool::close))
       .onErrorComplete()

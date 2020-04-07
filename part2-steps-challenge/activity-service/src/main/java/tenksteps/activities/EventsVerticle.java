@@ -63,7 +63,8 @@ public class EventsVerticle extends AbstractVerticle {
       data.getInteger("stepsCount"));
 
     return pgPool
-      .rxPreparedQuery(insertStepEvent(), values)
+      .preparedQuery(insertStepEvent())
+      .rxExecute(values)
       .map(rs -> record)
       .onErrorReturn(err -> {
         if (duplicateKeyInsert(err)) {
@@ -84,7 +85,8 @@ public class EventsVerticle extends AbstractVerticle {
     LocalDateTime now = LocalDateTime.now();
     String key = deviceId + ":" + now.getYear() + "-" + now.getMonth() + "-" + now.getDayOfMonth();
     return pgPool
-      .rxPreparedQuery(stepsCountForToday(), Tuple.of(deviceId))
+      .preparedQuery(stepsCountForToday())
+      .rxExecute(Tuple.of(deviceId))
       .map(rs -> rs.iterator().next())
       .map(row -> new JsonObject()
         .put("deviceId", deviceId)

@@ -28,14 +28,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.function.Function;
-import io.vertx.serviceproxy.ServiceProxyBuilder;
 import io.vertx.serviceproxy.ServiceException;
 import io.vertx.serviceproxy.ServiceExceptionMessageCodec;
 import io.vertx.serviceproxy.ProxyUtils;
 
 import io.vertx.core.Vertx;
 import chapter6.SensorDataService;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 /*
@@ -58,13 +56,14 @@ public class SensorDataServiceVertxEBProxy implements SensorDataService {
     this._vertx = vertx;
     this._address = address;
     this._options = options;
-    try{
+    try {
       this._vertx.eventBus().registerDefaultCodec(ServiceException.class, new ServiceExceptionMessageCodec());
-    } catch (IllegalStateException ex) {}
+    } catch (IllegalStateException ex) {
+    }
   }
 
   @Override
-  public  void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler){
+  public void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler){
     if (closed) {
       handler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;
@@ -83,7 +82,7 @@ public class SensorDataServiceVertxEBProxy implements SensorDataService {
     });
   }
   @Override
-  public  void average(Handler<AsyncResult<JsonObject>> handler){
+  public void average(Handler<AsyncResult<JsonObject>> handler){
     if (closed) {
       handler.handle(Future.failedFuture(new IllegalStateException("Proxy is closed")));
       return;

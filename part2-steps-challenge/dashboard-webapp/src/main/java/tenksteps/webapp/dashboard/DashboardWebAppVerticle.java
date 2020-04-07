@@ -6,7 +6,7 @@ import io.reactivex.internal.functions.Functions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.bridge.PermittedOptions;
-import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.reactivex.core.AbstractVerticle;
 import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
@@ -36,7 +36,6 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
   private static final Logger logger = LoggerFactory.getLogger(DashboardWebAppVerticle.class);
 
   private final HashMap<String, JsonObject> publicRanking = new HashMap<>();
-  private JsonArray latestRanking = new JsonArray();
 
   @Override
   public Completable rxStart() {
@@ -62,7 +61,7 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
     hydrate();
 
     SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
-    BridgeOptions bridgeOptions = new BridgeOptions()
+    SockJSBridgeOptions bridgeOptions = new SockJSBridgeOptions()
       .addInboundPermitted(new PermittedOptions().setAddressRegex("client.updates.*"))
       .addOutboundPermitted(new PermittedOptions().setAddressRegex("client.updates.*"));
     sockJSHandler.bridge(bridgeOptions);
@@ -139,8 +138,7 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
         .put("stepsCount", json.getLong("stepsCount"))
         .put("city", json.getString("city")))
       .collect(Collectors.toList());
-    latestRanking = new JsonArray(ranking);
-    return latestRanking;
+    return new JsonArray(ranking);
   }
 
   private void pruneOldEntries() {
@@ -167,16 +165,9 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
   }
 
   private int compareStepsCountInReverseOrder(JsonObject a, JsonObject b) {
-    // We cannot just subtract due to possible integer overflow
-    long c1 = a.getLong("stepsCount");
-    long c2 = b.getLong("stepsCount");
-    if (c1 < c2) {
-      return 1;
-    } else if (c1 == c2) {
-      return 0;
-    } else {
-      return -1;
-    }
+    Long first = a.getLong("stepsCount");
+    Long second = b.getLong("stepsCount");
+    return second.compareTo(first);
   }
 
   private void forwardKafkaRecord(KafkaConsumerRecord<String, JsonObject> record, String destination) {

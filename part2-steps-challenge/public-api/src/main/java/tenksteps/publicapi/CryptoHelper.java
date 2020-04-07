@@ -19,13 +19,8 @@ class CryptoHelper {
   private static String read(String file) throws IOException {
     Path path = Paths.get("public-api", file);
     if (!path.toFile().exists()) {
-      path = Paths.get("..","public-api", file);
+      path = Paths.get("..", "public-api", file);
     }
-    return Files
-      .readAllLines(path, StandardCharsets.UTF_8)
-      .stream()
-      .filter(line -> !line.startsWith("-----"))
-      .reduce(String::concat)
-      .orElse("OUPS");
+    return String.join("\n", Files.readAllLines(path, StandardCharsets.UTF_8));
   }
 }

@@ -2,10 +2,13 @@ package tenksteps.congrats;
 
 import io.reactivex.Flowable;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mail.MailConfig;
+import io.vertx.ext.mail.MailMessage;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
+import io.vertx.reactivex.ext.mail.MailClient;
 import io.vertx.reactivex.ext.web.client.HttpResponse;
 import io.vertx.reactivex.ext.web.client.WebClient;
 import io.vertx.reactivex.ext.web.codec.BodyCodec;
@@ -59,6 +62,7 @@ class CongratsTest {
       .ignoreElement()
       .andThen(webClient.delete(8025, "localhost", "/api/v1/messages").rxSend())
       .ignoreElement()
+      .delay(1, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 
@@ -70,6 +74,25 @@ class CongratsTest {
       .put("timestamp", now.toString())
       .put("stepsCount", steps);
     return KafkaProducerRecord.create("daily.step.updates", key, json);
+  }
+
+  @Test
+  @DisplayName("Smoke test to send a mail using mailhog")
+  void smokeTestSendmail(Vertx vertx, VertxTestContext testContext) {
+    MailConfig config = new MailConfig()
+      .setHostname("localhost")
+      .setPort(1025);
+    MailClient client = MailClient.createShared(vertx, config);
+    MailMessage message = new MailMessage()
+      .setFrom("a@b.tld")
+      .setSubject("Yo")
+      .setTo("c@d.tld")
+      .setText("This is cool");
+    client
+      .rxSendMail(message)
+      .subscribe(
+        ok -> testContext.completeNow(),
+        testContext::failNow);
   }
 
   @Test

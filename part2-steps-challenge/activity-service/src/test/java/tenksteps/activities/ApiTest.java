@@ -68,8 +68,9 @@ public class ApiTest {
     );
     PgPool pgPool = PgPool.pool(vertx, PgConfig.pgConnectOpts(), new PoolOptions());
 
-    pgPool.rxQuery("DELETE FROM stepevent")
-      .flatMap(rows -> pgPool.rxPreparedBatch(insertQuery, data))
+    pgPool.query("DELETE FROM stepevent")
+      .rxExecute()
+      .flatMap(rows -> pgPool.preparedQuery(insertQuery).rxExecuteBatch(data))
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle(new ActivityApiVerticle()))
       .ignoreElement()

@@ -63,7 +63,8 @@ class IntegrationTest {
       .setUser("postgres")
       .setPassword("vertx-in-action"), new PoolOptions());
 
-    pgPool.rxPreparedBatch(insertQuery, data)
+    pgPool.preparedQuery(insertQuery)
+      .rxExecuteBatch(data)
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle(new PublicApiVerticle()))
       .ignoreElement()

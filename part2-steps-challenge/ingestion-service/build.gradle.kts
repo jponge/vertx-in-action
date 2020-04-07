@@ -18,12 +18,13 @@ dependencies {
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
   testImplementation("io.vertx:vertx-junit5:$vertxVersion")
+  testImplementation("io.vertx:vertx-junit5-rx-java2:$vertxVersion")
   testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
   testImplementation("org.assertj:assertj-core:$assertjVersion")
 
   testImplementation("org.testcontainers:junit-jupiter:$testContainersVersion")
 
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5Version")
 }
 
 application {
