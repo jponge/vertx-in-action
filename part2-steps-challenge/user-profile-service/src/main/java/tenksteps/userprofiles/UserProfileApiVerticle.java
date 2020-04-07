@@ -40,7 +40,6 @@ public class UserProfileApiVerticle extends AbstractVerticle {
   public Completable rxStart() {
     mongoClient = MongoClient.createShared(vertx, mongoConfig());
 
-    JsonObject authConfig = new JsonObject();
     authProvider = MongoAuthentication.create(mongoClient, new MongoAuthenticationOptions());
     userUtil = MongoUserUtil.create(mongoClient, new MongoAuthenticationOptions(), new MongoAuthorizationOptions());
 
