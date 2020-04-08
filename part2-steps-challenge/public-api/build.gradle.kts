@@ -1,3 +1,7 @@
+plugins {
+  id("org.gradle.test-retry") version "1.1.4"
+}
+
 dependencies {
   val vertxVersion = project.extra["vertxVersion"]
   val junit5Version = project.extra["junit5Version"]
@@ -32,4 +36,7 @@ application {
 
 tasks.test {
   useJUnitPlatform()
+  retry {
+    maxRetries.set(1)
+  }
 }
