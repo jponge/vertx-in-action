@@ -22,8 +22,8 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
     - name: Build the chapter-specific examples
-      run: ./gradlew --no-daemon build-chapters
+      run: ./gradlew build-chapters --refresh-dependencies
       shell: bash
     - name: Build the part2 10k steps challenge application
-      run: ./gradlew --no-daemon build-part2-steps-challenge
+      run: ./gradlew build-part2-steps-challenge --refresh-dependencies
       shell: bash
