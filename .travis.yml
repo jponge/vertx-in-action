@@ -13,8 +13,10 @@ jobs:
   include:
     - stage: test
       name: "Chapter-specific examples"
+      jdk: openjdk8
       script: ./gradlew build-chapters --refresh-dependencies
     - name: "Part2 10k steps challenge application"
+      jdk: openjdk8
       script: ./gradlew build-part2-steps-challenge --refresh-dependencies
 
 
