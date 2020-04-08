@@ -1,0 +1,28 @@
+language: java
+
+services:
+  - docker
+
+install: true
+
+jdk:
+  - openjdk8
+  - openjdk11
+
+jobs:
+  include:
+    - stage: test
+      name: "Build the chapter-specific examples"
+      script: ./gradlew build-chapters --refresh-dependencies
+    - name: "Build the part2 10k steps challenge application"
+      script: ./gradlew build-part2-steps-challenge --refresh-dependencies
+
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
