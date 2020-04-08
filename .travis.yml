@@ -11,9 +11,10 @@ jdk:
 
 jobs:
   include:
-    - stage: "Chapter-specific examples"
+    - stage: test
+      name: "Chapter-specific examples"
       script: ./gradlew build-chapters --refresh-dependencies
-    - stage: "Part2 10k steps challenge application"
+    - name: "Part2 10k steps challenge application"
       script: ./gradlew build-part2-steps-challenge --refresh-dependencies
 
 
