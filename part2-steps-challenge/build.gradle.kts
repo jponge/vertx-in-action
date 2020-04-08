@@ -34,6 +34,17 @@ subprojects {
     sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
   }
+
+  tasks.named<Test>("test") {
+    reports.html.isEnabled = false
+  }
+}
+
+tasks.register<TestReport>("testReport") {
+  description = "Aggregate all test results as a HTML report"
+  group = "Documentation"
+  destinationDir = file("$buildDir/reports/allTests")
+  reportOn(subprojects.map { it.tasks["test"] })
 }
 
 tasks.register("build-all") {
