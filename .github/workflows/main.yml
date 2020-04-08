@@ -5,6 +5,8 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  schedule:
+    - cron: '0 9 * * *'
 
 jobs:
   build:
@@ -19,6 +21,9 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: ${{ matrix.java }}
-    - name: Build chapter-specific examples
-      run: ./gradlew build-chapters
+    - name: Build the chapter-specific examples
+      run: ./gradlew --no-daemon build-chapters
       shell: bash
+    - name: Build the part2 10k steps challenge application
+        run: ./gradlew --no-daemon build-part2-steps-challenge
+        shell: bash
