@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
 import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.reactivex.core.RxHelper;
 import io.vertx.reactivex.core.Vertx;
 import io.vertx.reactivex.pgclient.PgPool;
 import io.vertx.reactivex.sqlclient.Tuple;
@@ -26,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static java.util.Arrays.asList;
@@ -72,6 +74,7 @@ class IntegrationTest {
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle("tenksteps.activities.ActivityApiVerticle"))
       .ignoreElement()
+      .delay(5, TimeUnit.SECONDS, RxHelper.scheduler(vertx))
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 
