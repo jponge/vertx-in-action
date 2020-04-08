@@ -20,4 +20,5 @@ jobs:
       with:
         java-version: ${{ matrix.java }}
     - name: Build chapter-specific examples
-      run: ./build-all.sh
+      run: ./gradlew build-chapters
+      shell: bash
