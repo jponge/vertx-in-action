@@ -25,5 +25,5 @@ jobs:
       run: ./gradlew --no-daemon build-chapters
       shell: bash
     - name: Build the part2 10k steps challenge application
-        run: ./gradlew --no-daemon build-part2-steps-challenge
-        shell: bash
+      run: ./gradlew --no-daemon build-part2-steps-challenge
+      shell: bash
