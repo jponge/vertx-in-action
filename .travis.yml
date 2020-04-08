@@ -1,5 +1,9 @@
 language: java
 
+branches:
+  only:
+    - master
+
 services:
   - docker
 
@@ -13,7 +17,6 @@ matrix:
 script:
   - ./gradlew build-chapters --refresh-dependencies
   - ./gradlew build-part2-steps-challenge --refresh-dependencies
-
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
