@@ -1,51 +1,39 @@
 from locust import *
+from locust.contrib.fasthttp import FastHttpLocust
 from locust.exception import StopLocust
 from random import *
 from itertools import *
 from datetime import datetime
 import os
 import json
+import uuid
 import random
 
-ID = datetime.now().strftime("%Y%m%d-%H-%M-%S")
+cities = cycle([
+  "Tassin La Demi Lune",
+  "Lyon",
+  "Sydney",
+  "Aubiere",
+  "Clermont-Ferrand",
+  "Nevers",
+  "Garchizy"
+])
 
-FAST_MODE = os.getenv("FAST_TENK", 0) is not 0
+sequence = count()
 
-def seq():
-  n = 0
-  while True:
-    yield n
-    n = n + 1
-
-SEQ = seq()
-
-def cities():
-  names = [
-    "Tassin La Demi Lune",
-    "Lyon",
-    "Sydney",
-    "Aubiere",
-    "Clermont-Ferrand",
-    "Nevers",
-    "Garchizy"
-  ]
-  return cycle(names)
-
-CITIES = cities()
-
-class UserWithDevice(TaskSet):
+class UserBehavior(TaskSet):
 
   def on_start(self):
-    n = next(SEQ)
-    self.username = f"locust-user-{ID}-{n}"
-    self.password = f"abc_123!{n}"
-    self.email = f"locust-user-{ID}-{n}@mail.tld"
-    self.deviceId = f"podometer-{n}-{n*2}-{ID}"
-    self.city = next(CITIES)
+    n = next(sequence)
+    self.registered = False
+    self.token = None
+    self.username = f"user{n}-{str(uuid.uuid1())}"
+    self.password = str(uuid.uuid4())
+    self.email = f"user{n}@my.tld"
+    self.deviceId = str(uuid.uuid1())
+    self.city = next(cities)
     self.makePublic = (n % 2) is 0
     self.deviceSync = 0
-    self.register()
-    self.fetch_token()
 
   def register(self):
     data = json.dumps({
@@ -58,9 +46,9 @@ class UserWithDevice(TaskSet):
     })
     headers = {"Content-Type": "application/json"}
     with self.client.post("http://localhost:4000/api/v1/register", headers=headers, data=data, name="Register", catch_response=True) as response:
-      if response.status_code != 200:
-        response.failure(f"Registration failed with data {data}")
-        raise StopLocust()
+      if response.status_code in (200, 409):
+        self.registered = True
+        response.success()
 
   def fetch_token(self):
     data = json.dumps({
@@ -68,43 +56,58 @@ class UserWithDevice(TaskSet):
       "password": self.password
     })
     headers = {"Content-Type": "application/json"}
-    response = self.client.post("http://localhost:4000/api/v1/token", headers=headers, data=data, name="Fetch token")
-    self.token = response.text
+    with self.client.post("http://localhost:4000/api/v1/token", headers=headers, data=data, name="Fetch token", catch_response=True) as response:
+      if response.status_code == 200:
+        self.token = response.text
+        response.success()
 
-  @task(4)
+  def is_ready(self):
+    if not self.registered:
+      self.register()
+    if self.token == None:
+      self.fetch_token()
+    return self.registered and (self.fetch_token != None)
+
+  @task(80)
   def send_steps(self):
-    min_delta = 100 if FAST_MODE else 0
-    max_delta = 1000 if FAST_MODE else 100
+    if not self.is_ready():
+      return
     self.deviceSync = self.deviceSync + 1
     data = json.dumps({
       "deviceId": self.deviceId,
       "deviceSync": self.deviceSync,
-      "stepsCount": random.randint(min_delta, max_delta)
+      "stepsCount": random.randint(0, 100)
     })
     headers = {"Content-Type": "application/json"}
     self.client.post("http://localhost:3002/ingest", headers=headers, data=data, name="Steps update")
 
-  @task(1)
+  @task(5)
   def my_profile_data(self):
+    if not self.is_ready():
+      return
     headers = {"Authorization": f"Bearer {self.token}"}
     self.client.get(f"http://localhost:4000/api/v1/{self.username}", headers=headers, name="Fetch profile data")
 
-  @task(1)
+  @task(5)
   def how_many_total_steps(self):
+    if not self.is_ready():
+      return
     headers = {"Authorization": f"Bearer {self.token}"}
     with self.client.get(f"http://localhost:4000/api/v1/{self.username}/total", headers=headers, name="Fetch total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
-  @task(1)
+  @task(10)
   def how_many_steps_today(self):
+    if not self.is_ready():
+      return
     now = datetime.now()
     headers = {"Authorization": f"Bearer {self.token}"}
     with self.client.get(f"http://localhost:4000/api/v1/{self.username}/{now.year}/{now.month}/{now.day}", headers=headers, name="Fetch today total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
-class UserWithDeviceLocust(HttpLocust):
-  task_set = UserWithDevice
-  host = "localhost"
-  wait_time = between(10000, 30000) if not FAST_MODE else between(500, 1000)
+class UserWithDevice(HttpLocust):
+  task_set = UserBehavior
+  host = "http://localhost"
+  wait_time = between(0.5, 2.0)
