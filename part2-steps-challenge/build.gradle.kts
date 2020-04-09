@@ -2,6 +2,17 @@ plugins {
   id("com.github.ben-manes.versions") version "0.28.0"
   id("com.github.johnrengelman.shadow") version "5.2.0" apply false
   id("com.adarshr.test-logger") version "2.0.0" apply false
+  id("com.moowork.node") version "1.3.1" apply false
+  id("org.gradle.test-retry") version "1.1.4" apply false
+}
+
+allprojects {
+  extra["vertxVersion"] = "4.0.0-SNAPSHOT"
+  extra["junit5Version"] = "5.6.1"
+  extra["restAssuredVersion"] = "4.3.0"
+  extra["logbackClassicVersion"] = "1.2.3"
+  extra["assertjVersion"] = "3.15.0"
+  extra["testContainersVersion"] = "1.13.0"
 }
 
 subprojects {
@@ -17,13 +28,6 @@ subprojects {
       url = uri("https://oss.sonatype.org/content/repositories/snapshots")
     }
   }
-
-  project.project.extra["vertxVersion"] = "4.0.0-SNAPSHOT"
-  project.project.extra["junit5Version"] = "5.6.1"
-  project.project.extra["restAssuredVersion"] = "4.3.0"
-  project.project.extra["logbackClassicVersion"] = "1.2.3"
-  project.project.extra["assertjVersion"] = "3.15.0"
-  project.project.extra["testContainersVersion"] = "1.13.0"
 
   apply(plugin = "java")
   apply(plugin = "application")

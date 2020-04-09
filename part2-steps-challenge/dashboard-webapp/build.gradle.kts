@@ -1,8 +1,6 @@
 import com.moowork.gradle.node.yarn.YarnTask
 
-plugins {
-  id("com.moowork.node") version "1.3.1"
-}
+apply(plugin = "com.moowork.node")
 
 dependencies {
   val vertxVersion = project.extra["vertxVersion"]

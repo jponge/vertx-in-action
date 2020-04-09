@@ -1,6 +1,4 @@
-plugins {
-  id("org.gradle.test-retry") version "1.1.4"
-}
+apply(plugin = "org.gradle.test-retry")
 
 dependencies {
   val vertxVersion = project.extra["vertxVersion"]
