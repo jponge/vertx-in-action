@@ -1,5 +1,6 @@
 package tenksteps.publicapi;
 
+import io.reactivex.Completable;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
@@ -72,6 +73,7 @@ class IntegrationTest {
       .ignoreElement()
       .andThen(vertx.rxDeployVerticle("tenksteps.activities.ActivityApiVerticle"))
       .ignoreElement()
+      .andThen(Completable.fromAction(pgPool::close))
       .subscribe(testContext::completeNow, testContext::failNow);
   }
 
