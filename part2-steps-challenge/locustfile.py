@@ -107,5 +107,4 @@ class UserWithDevice(TaskSet):
 class UserWithDeviceLocust(HttpLocust):
   task_set = UserWithDevice
   host = "localhost"
-  min_wait = 10000 if not FAST_MODE else 500
-  max_wait = 30000 if not FAST_MODE else 1000
+  wait_time = between(10000, 30000) if not FAST_MODE else between(500, 1000)
