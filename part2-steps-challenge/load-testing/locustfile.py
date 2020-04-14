@@ -107,5 +107,4 @@ class UserBehavior(TaskSet):
 
 class UserWithDevice(HttpLocust):
   task_set = UserBehavior
-  host = "http://localhost"
   wait_time = between(0.5, 2.0)
