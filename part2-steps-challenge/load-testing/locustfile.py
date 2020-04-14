@@ -43,7 +43,7 @@ class UserBehavior(TaskSet):
       "makePublic": self.makePublic
     })
     headers = {"Content-Type": "application/json"}
-    with self.client.post("http://localhost:4000/api/v1/register", headers=headers, data=data, name="Register", catch_response=True) as response:
+    with self.client.post(":4000/api/v1/register", headers=headers, data=data, name="Register", catch_response=True) as response:
       if response.status_code in (200, 409):
         self.registered = True
         response.success()
@@ -54,7 +54,7 @@ class UserBehavior(TaskSet):
       "password": self.password
     })
     headers = {"Content-Type": "application/json"}
-    with self.client.post("http://localhost:4000/api/v1/token", headers=headers, data=data, name="Fetch token", catch_response=True) as response:
+    with self.client.post(":4000/api/v1/token", headers=headers, data=data, name="Fetch token", catch_response=True) as response:
       if response.status_code == 200:
         self.token = response.text
         response.success()
@@ -77,21 +77,21 @@ class UserBehavior(TaskSet):
       "stepsCount": random.randint(0, 100)
     })
     headers = {"Content-Type": "application/json"}
-    self.client.post("http://localhost:3002/ingest", headers=headers, data=data, name="Steps update")
+    self.client.post(":3002/ingest", headers=headers, data=data, name="Steps update")
 
   @task(5)
   def my_profile_data(self):
     if not self.is_ready():
       return
     headers = {"Authorization": f"Bearer {self.token}"}
-    self.client.get(f"http://localhost:4000/api/v1/{self.username}", headers=headers, name="Fetch profile data")
+    self.client.get(f":4000/api/v1/{self.username}", headers=headers, name="Fetch profile data")
 
   @task(5)
   def how_many_total_steps(self):
     if not self.is_ready():
       return
     headers = {"Authorization": f"Bearer {self.token}"}
-    with self.client.get(f"http://localhost:4000/api/v1/{self.username}/total", headers=headers, name="Fetch total steps", catch_response=True) as response:
+    with self.client.get(f":4000/api/v1/{self.username}/total", headers=headers, name="Fetch total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
@@ -101,10 +101,11 @@ class UserBehavior(TaskSet):
       return
     now = datetime.now()
     headers = {"Authorization": f"Bearer {self.token}"}
-    with self.client.get(f"http://localhost:4000/api/v1/{self.username}/{now.year}/{now.month}/{now.day}", headers=headers, name="Fetch today total steps", catch_response=True) as response:
+    with self.client.get(f":4000/api/v1/{self.username}/{now.year}/{now.month}/{now.day}", headers=headers, name="Fetch today total steps", catch_response=True) as response:
       if response.status_code in (200, 404):
         response.success()
 
 class UserWithDevice(HttpLocust):
   task_set = UserBehavior
+  host = "http://localhost"
   wait_time = between(0.5, 2.0)
