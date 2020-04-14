@@ -1,6 +1,4 @@
 from locust import *
-from locust.contrib.fasthttp import FastHttpLocust
-from locust.exception import StopLocust
 from random import *
 from itertools import *
 from datetime import datetime
@@ -32,7 +30,7 @@ class UserBehavior(TaskSet):
     self.email = f"user{n}@my.tld"
     self.deviceId = str(uuid.uuid1())
     self.city = next(cities)
-    self.makePublic = (n % 2) is 0
+    self.makePublic = (n % 2) == 0
     self.deviceSync = 0
 
   def register(self):
