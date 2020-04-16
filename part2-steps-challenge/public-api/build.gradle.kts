@@ -7,11 +7,14 @@ dependencies {
   val restAssuredVersion = project.extra["restAssuredVersion"]
   val assertjVersion = project.extra["assertjVersion"]
   val testContainersVersion = project.extra["testContainersVersion"]
+  val caffeineVersion = project.extra["caffeineVersion"]
 
   implementation("io.vertx:vertx-rx-java2:$vertxVersion")
   implementation("io.vertx:vertx-web:$vertxVersion")
   implementation("io.vertx:vertx-web-client:$vertxVersion")
   implementation("io.vertx:vertx-auth-jwt:$vertxVersion")
+  implementation("io.vertx:vertx-circuit-breaker:$vertxVersion")
+  implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
   implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
 
   testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5Version")
