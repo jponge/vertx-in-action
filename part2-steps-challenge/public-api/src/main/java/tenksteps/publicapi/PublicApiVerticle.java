@@ -270,6 +270,7 @@ public class PublicApiVerticle extends AbstractVerticle {
     activityCircuitBreaker.<Void>executeWithFallback(promise -> {
       webClient
         .get(3001, "localhost", "/" + deviceId + "/total")
+        .timeout(5000)
         .expect(ResponsePredicate.SC_OK)
         .as(BodyCodec.jsonObject())
         .rxSend()
