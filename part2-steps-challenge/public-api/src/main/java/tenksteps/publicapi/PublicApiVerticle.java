@@ -136,6 +136,7 @@ public class PublicApiVerticle extends AbstractVerticle {
     String username = payload.getString("username");
     webClient
       .post(3000, "localhost", "/authenticate")
+      .timeout(5000)
       .expect(ResponsePredicate.SC_SUCCESS)
       .rxSendJson(payload)
       .flatMap(resp -> fetchUserDetails(username))
@@ -149,6 +150,7 @@ public class PublicApiVerticle extends AbstractVerticle {
   private Single<HttpResponse<JsonObject>> fetchUserDetails(String username) {
     return webClient
       .get(3000, "localhost", "/" + username)
+      .timeout(5000)
       .expect(ResponsePredicate.SC_OK)
       .as(BodyCodec.jsonObject())
       .rxSend();
@@ -209,6 +211,7 @@ public class PublicApiVerticle extends AbstractVerticle {
     String deviceId = ctx.user().principal().getString("deviceId");
     webClient
       .get(3001, "localhost", "/" + deviceId + "/total")
+      .timeout(5000)
       .as(BodyCodec.jsonObject())
       .rxSend()
       .subscribe(
