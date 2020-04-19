@@ -32,7 +32,12 @@ throughput = event_count / duration
 throughput_min = throughputs.min()
 throughput_max = throughputs.max()
 throughput_median = throughputs.median()
-error_rate = (ko_values.shape[0] / ok_values.shape[0]) * 100.0
+n_ko = ko_values.shape[0]
+n_ok = ok_values.shape[0]
+if n_ok > n_ko:
+  error_or_success_info = f"errors={round((n_ko / n_ok) * 100.0, 2)}%"
+else:
+  error_or_success_info = f"success={round((n_ok / n_ko) * 100.0, 2)}%"
 
 fig, axs = plt.subplots(nrows=3, gridspec_kw=dict(height_ratios=[55, 25, 20]))
 
@@ -41,7 +46,7 @@ ko_values.plot(kind="scatter", x="offset", y="response-time", ax=axs[0], label="
 
 axs[0].set_xlabel("Time offset (s)")
 axs[0].set_ylabel("Latency (s)")
-axs[0].text(1, 1.1, f"min={min_response}, median={median_response}, max={max_response}, {event_count} events, {round(error_rate, 2)}% errors", fontsize=8, transform=axs[0].transAxes, horizontalalignment="right")
+axs[0].text(1, 1.1, f"min={min_response}, median={median_response}, max={max_response}, {event_count} events, {error_or_success_info}", fontsize=8, transform=axs[0].transAxes, horizontalalignment="right")
 
 throughputs.plot(ax=axs[1], color="tab:blue")
 axs[1].set_xlabel("Time offset (s)")
@@ -74,6 +79,6 @@ print("mean =", mean_response, "(s)")
 print("max =", max_response, "(s)")
 print()
 print("count =", event_count, "events")
-print("errors =", error_rate, "%")
+print(error_or_success_info)
 print("duration =", duration, "(s)")
 print("throughput = ", throughput, "(reqs/s) / min=", throughput_min, "max=", throughput_max)
