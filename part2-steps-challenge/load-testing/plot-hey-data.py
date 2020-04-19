@@ -19,7 +19,7 @@ ko_values = data[data["status-code"] != 200]
 throughputs = data.round({"offset": 0}).groupby("offset").count()["status-code"]
 
 dist = pd.DataFrame(columns=["percentile", "response-time"])
-for q in [0.75, 0.8, 0.85, 0.9, 0.95, 0.98, 0.99, 0.999, 0.9999, 1.0]:
+for q in [0.10, 0.50, 0.75, 0.80, 0.85, 0.90, 0.95, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1.0]:
   dist = dist.append({"percentile": q * 100.0, "response-time": data["response-time"].quantile(q)}, ignore_index=True)
 
 min_response = data["response-time"].min()
@@ -57,13 +57,14 @@ dist.plot(kind="area", x="percentile", y="response-time", ax=axs[2], color="tab:
 
 axs[2].set_xlabel("Percentiles")
 axs[2].set_ylabel("Latency (s)")
+axs[2].set_xlim(95.0, 100.0)
 
-p75 = round(dist.loc[dist["percentile"] == 75.00]["response-time"].values[0], 3)
-p90 = round(dist.loc[dist["percentile"] == 90.00]["response-time"].values[0], 3)
 p95 = round(dist.loc[dist["percentile"] == 95.00]["response-time"].values[0], 3)
 p99 = round(dist.loc[dist["percentile"] == 99.00]["response-time"].values[0], 3)
 p999 = round(dist.loc[dist["percentile"] == 99.90]["response-time"].values[0], 3)
-axs[2].text(1, 1.3, f"p75={p75}, p90={p90}, p95={p95}, p99={p99}, p99.9={p999}", fontsize=8, transform=axs[2].transAxes, horizontalalignment="right")
+p9999 = round(dist.loc[dist["percentile"] == 99.99]["response-time"].values[0], 3)
+p100 = round(dist.loc[dist["percentile"] == 100.0]["response-time"].values[0], 3)
+axs[2].text(1, 1.3, f"p95={p95}, p99={p99}, p99.9={p999}, p9.999={p9999}, p100={p100}", fontsize=8, transform=axs[2].transAxes, horizontalalignment="right")
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
