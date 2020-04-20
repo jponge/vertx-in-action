@@ -17,6 +17,10 @@ ok_values = data[data["status-code"] == 200]
 ko_values = data[data["status-code"] != 200]
 
 throughputs = data.round({"offset": 0}).groupby("offset").count()["status-code"]
+for n in range(0, int(throughputs.index.max())):
+  if throughputs.get(n) is None:
+    throughputs[float(n)] = 0
+throughputs = throughputs.sort_index()
 
 dist = pd.DataFrame(columns=["percentile", "response-time"])
 for q in [0.10, 0.50, 0.75, 0.80, 0.85, 0.90, 0.95, 0.98, 0.99, 0.999, 0.9999, 0.99999, 1.0]:
