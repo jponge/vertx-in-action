@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: heat-sensor-service
+  name: heat-sensor-service
+spec:
+  selector:
+    matchLabels:
+      app: heat-sensor-service
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: heat-sensor-service
+    spec:
+      containers:
+        - image: vertx-in-action/heat-sensor-service:latest
+          name: heat-sensor-service

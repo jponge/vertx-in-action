@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sensor-gateway-config
+data:
+  gateway_hostname: sensor-gateway.default.svc.cluster.local
+  gateway_port: "8080"

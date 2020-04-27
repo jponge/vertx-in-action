@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sensor-gateway
+  name: sensor-gateway
+spec:
+  selector:
+    matchLabels:
+      app: sensor-gateway
+  template:
+    metadata:
+      labels:
+        app: sensor-gateway
+    spec:
+      containers:
+        - image: vertx-in-action/sensor-gateway:latest
+          name: sensor-gateway

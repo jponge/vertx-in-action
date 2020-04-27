@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: heat-sensor-service
+    vertx-in-action: chapter13
+  name: heat-sensor-service
+spec:
+  clusterIP: None
+  selector:
+    app: heat-sensor-service
+  ports:
+    - name: http
+      port: 8080
+    - name: hazelcast
+      port: 5701

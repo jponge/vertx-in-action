@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: heat-api
+  name: heat-api
+spec:
+  selector:
+    matchLabels:
+      app: heat-api
+  template:
+    metadata:
+      labels:
+        app: heat-api
+    spec:
+      containers:
+        - image: vertx-in-action/heat-api:latest
+          name: heat-api
+          env:
+            - name: LOW_TEMP
+              value: "12.0"
+            - name: HIGH_TEMP
+              value: "32.0"
+            - name: GATEWAY_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: sensor-gateway-config
+                  key: gateway_hostname
+            - name: GATEWAY_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sensor-gateway-config
+                  key: gateway_port
