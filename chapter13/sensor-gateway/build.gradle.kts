@@ -11,7 +11,7 @@ dependencies {
 
 jib {
   from {
-    image = "adoptopenjdk/openjdk11:ubi-minimal"
+    image = "adoptopenjdk/openjdk11:ubi-minimal-jre"
   }
   to {
     image = "vertx-in-action/sensor-gateway"
