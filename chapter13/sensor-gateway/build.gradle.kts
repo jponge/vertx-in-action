@@ -18,8 +18,6 @@ jib {
     tags = setOf("v1", "latest")
   }
   container {
-//    mainClass = "io.vertx.core.Launcher"
-//    args = listOf("run", "chapter13.gateway.Gateway", "-cluster")
     mainClass = "chapter13.gateway.Gateway"
     jvmFlags = listOf("-noverify", "-Djava.security.egd=file:/dev/./urandom")
     ports = listOf("8080", "5701")
