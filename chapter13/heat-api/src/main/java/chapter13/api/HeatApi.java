@@ -35,7 +35,7 @@ public class HeatApi extends AbstractVerticle {
     lowLimit = Double.parseDouble(env.getOrDefault("LOW_TEMP", "10.0"));
     highLimit = Double.parseDouble(env.getOrDefault("HIGH_TEMP", "30.0"));
 
-    logger.info("Correct temperatures: [{}, {}]", lowLimit, highLimit);
+    logger.info("Correct temperatures range: [{}, {}]", lowLimit, highLimit);
 
     webClient = WebClient.create(vertx, new WebClientOptions()
       .setDefaultHost(gatewayHost)
