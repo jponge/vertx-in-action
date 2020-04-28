@@ -44,6 +44,8 @@ public class HeatApi extends AbstractVerticle {
     Router router = Router.router(vertx);
     router.get("/all").handler(this::fetchAllData);
     router.get("/warnings").handler(this::sensorsOverLimits);
+    router.get("/health/ready").handler(this::readinessCheck);
+    router.get("/health/live").handler(this::livenessCheck);
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -97,6 +99,40 @@ public class HeatApi extends AbstractVerticle {
         .putHeader("Content-Type", "application/json")
         .end(data.encode());
     });
+  }
+
+  private final JsonObject okStatus = new JsonObject()
+    .put("status", "UP");
+
+  private void livenessCheck(RoutingContext ctx) {
+    logger.info("Liveness check");
+    ctx.response()
+      .putHeader("Content-Type", "application/json")
+      .end(okStatus.encode());
+  }
+
+  private void readinessCheck(RoutingContext ctx) {
+    webClient.get("/health")
+      .expect(ResponsePredicate.SC_OK)
+      .timeout(5000)
+      .send(ar -> {
+        if (ar.succeeded()) {
+          logger.info("Readiness check complete");
+          ctx.response()
+            .setStatusCode(200)
+            .putHeader("Content-Type", "application/json")
+            .end(okStatus.encode());
+        } else {
+          logger.error("Readiness check failed", ar.cause());
+          ctx.response()
+            .setStatusCode(503)
+            .putHeader("Content-Type", "application/json")
+            .end(new JsonObject()
+              .put("status", "DOWN")
+              .put("reason", ar.cause().getMessage())
+              .encode());
+        }
+      });
   }
 
   public static void main(String[] args) {

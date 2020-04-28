@@ -53,6 +53,7 @@ public class HeatSensor extends AbstractVerticle {
 
     Router router = Router.router(vertx);
     router.get("/data").handler(this::handleRequest);
+    router.get("/health").handler(this::healthCheck);
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -78,6 +79,16 @@ public class HeatSensor extends AbstractVerticle {
     ctx.response()
       .putHeader("Content-Type", "application/json")
       .end(makeJsonPayload().encode());
+  }
+
+  private final JsonObject okStatus = new JsonObject()
+    .put("status", "UP");
+
+  private void healthCheck(RoutingContext ctx) {
+    logger.info("Health check");
+    ctx.response()
+      .putHeader("Content-Type", "application/json")
+      .end(okStatus.encode());
   }
 
   public static void main(String[] args) throws UnknownHostException {

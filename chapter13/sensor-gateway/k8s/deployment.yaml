@@ -16,3 +16,10 @@ spec:
       containers:
         - image: vertx-in-action/sensor-gateway:latest
           name: sensor-gateway
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5

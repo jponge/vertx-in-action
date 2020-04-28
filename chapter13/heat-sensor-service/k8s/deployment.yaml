@@ -17,3 +17,11 @@ spec:
       containers:
         - image: vertx-in-action/heat-sensor-service:latest
           name: heat-sensor-service
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 5
+
