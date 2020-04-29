@@ -9,6 +9,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.micrometer.MicrometerMetricsOptions;
+import io.vertx.micrometer.PrometheusScrapingHandler;
+import io.vertx.micrometer.VertxPrometheusOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +42,13 @@ public class Gateway extends AbstractVerticle {
     Router router = Router.router(vertx);
     router.get("/data").handler(this::handleRequest);
     router.get("/health").handler(this::healthCheck);
+
+    router.route("/metrics")
+      .handler(ctx -> {
+        logger.info("Collecting metrics");
+        ctx.next();
+      })
+      .handler(PrometheusScrapingHandler.create());
 
     vertx.createHttpServer()
       .requestHandler(router)
@@ -78,7 +88,12 @@ public class Gateway extends AbstractVerticle {
     VertxOptions options = new VertxOptions()
       .setEventBusOptions(new EventBusOptions()
         .setHost(ipv4)
-        .setClusterPublicHost(ipv4));
+        .setClusterPublicHost(ipv4))
+      .setMetricsOptions(new MicrometerMetricsOptions()
+        .setPrometheusOptions(new VertxPrometheusOptions()
+          .setPublishQuantiles(true)
+          .setEnabled(true))
+        .setEnabled(true));
     Vertx.clusteredVertx(options, ar -> {
       if (ar.succeeded()) {
         ar.result().deployVerticle(new Gateway());

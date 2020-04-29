@@ -6,6 +6,8 @@ dependencies {
   implementation("io.vertx:vertx-web:$vertxVersion")
   implementation("io.vertx:vertx-hazelcast:$vertxVersion")
   implementation("com.hazelcast:hazelcast-kubernetes:$hzVersion")
+  implementation("io.vertx:vertx-micrometer-metrics:$vertxVersion")
+  implementation("io.micrometer:micrometer-registry-prometheus:1.4.2")
   implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
 }
 

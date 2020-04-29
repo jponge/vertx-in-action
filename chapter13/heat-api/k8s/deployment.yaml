@@ -20,7 +20,7 @@ spec:
             - name: LOW_TEMP
               value: "12.0"
             - name: HIGH_TEMP
-              value: "32.0"
+              value: "32.0P"
             - name: GATEWAY_HOST
               valueFrom:
                 configMapKeyRef:

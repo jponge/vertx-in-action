@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: monitor-gateway
+  labels:
+    app: sensor-gateway
+spec:
+  selector:
+    matchLabels:
+      app: sensor-gateway
+  endpoints:
+    - port: http
+      path: /metrics
