@@ -85,15 +85,12 @@ public class HeatApi extends AbstractVerticle {
   private void sensorsOverLimits(RoutingContext routingContext) {
     fetchData(routingContext, resp -> {
       JsonObject data = resp.body();
-      JsonArray values = data.getJsonArray("data");
       JsonArray warnings = new JsonArray();
-      for (int i = 0; i < values.size(); i++) {
-        JsonObject entry = values.getJsonObject(i);
-        double temp = entry.getDouble("temp");
-        if (temp <= lowLimit || temp >= highLimit) {
-          warnings.add(entry);
-        }
-      }
+      data.getJsonArray("data").stream()
+        .map(JsonObject.class::cast)
+        .filter(value -> value.getDouble("temp") <= lowLimit)
+        .filter(value -> value.getDouble("temp") >= highLimit)
+        .forEach(warnings::add);
       data.put("data", warnings);
       routingContext.response()
         .putHeader("Content-Type", "application/json")
