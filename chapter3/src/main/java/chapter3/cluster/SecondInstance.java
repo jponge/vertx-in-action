@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SecondInstance extends AbstractVerticle {
+public class SecondInstance {
 
   private static final Logger logger = LoggerFactory.getLogger(SecondInstance.class);
 

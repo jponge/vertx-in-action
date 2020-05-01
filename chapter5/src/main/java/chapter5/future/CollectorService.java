@@ -28,7 +28,10 @@ public class CollectorService extends AbstractVerticle {
       .requestHandler(this::handleRequest)
       .listen(8080)
       .onFailure(promise::fail)
-      .onSuccess(ok -> System.out.println("http://localhost:8080/"));
+      .onSuccess(ok -> {
+        System.out.println("http://localhost:8080/");
+        promise.complete();
+      });
   }
 
   private void handleRequest(HttpServerRequest request) {
