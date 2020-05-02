@@ -1,13 +1,14 @@
 val vertxVersion = project.extra["vertxVersion"]
 val hzVersion = project.extra["hzVersion"]
 val logbackClassicVersion = project.extra["logbackClassicVersion"]
+val mpromVersion = project.extra["mpromVersion"]
 
 dependencies {
   implementation("io.vertx:vertx-web:$vertxVersion")
   implementation("io.vertx:vertx-hazelcast:$vertxVersion")
   implementation("com.hazelcast:hazelcast-kubernetes:$hzVersion")
   implementation("io.vertx:vertx-micrometer-metrics:$vertxVersion")
-  implementation("io.micrometer:micrometer-registry-prometheus:1.4.2")
+  implementation("io.micrometer:micrometer-registry-prometheus:$mpromVersion")
   implementation("ch.qos.logback:logback-classic:$logbackClassicVersion")
 }
 
