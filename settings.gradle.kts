@@ -6,5 +6,6 @@ includeBuild("chapter3")
 includeBuild("chapter4")
 includeBuild("chapter5")
 includeBuild("chapter6")
+includeBuild("chapter13")
 
 includeBuild("part2-steps-challenge")
