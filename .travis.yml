@@ -12,14 +12,21 @@ services:
 
 install: true
 
-matrix:
-  include:
-    - jdk: openjdk8
-    - jdk: openjdk11
+jdk:
+  - openjdk8
+  - openjdk11
 
-script:
-  - ./gradlew build-chapters --refresh-dependencies
-  - ./gradlew build-part2-steps-challenge --refresh-dependencies
+env:
+  - PROJECT=chapter1
+  - PROJECT=chapter2
+  - PROJECT=chapter3
+  - PROJECT=chapter4
+  - PROJECT=chapter5
+  - PROJECT=chapter6
+  - PROJECT=chapter13
+  - PROJECT=part2-steps-challenge
+
+script: cd $PROJECT && ./gradlew build --refresh-dependencies
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
