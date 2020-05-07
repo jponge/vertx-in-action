@@ -51,14 +51,6 @@ tasks.register<TestReport>("testReport") {
   reportOn(subprojects.map { it.tasks["test"] })
 }
 
-tasks.register("build-all") {
-  dependsOn(subprojects.map { ":${it.name}:build" })
-}
-
-tasks.register("clean-all") {
-  dependsOn(subprojects.map { ":${it.name}:clean" })
-}
-
 tasks.wrapper {
   distributionType = Wrapper.DistributionType.ALL
   gradleVersion = "6.3"
