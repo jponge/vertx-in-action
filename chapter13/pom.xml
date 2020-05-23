@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.manning.vertx-in-action</groupId>
+  <artifactId>chapter13-parent</artifactId>
+  <version>1.0</version>
+
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>heat-api</module>
+    <module>heat-sensor-service</module>
+    <module>sensor-gateway</module>
+  </modules>
+
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <vertx.version>4.0.0-SNAPSHOT</vertx.version>
+    <logback-classic.version>1.2.3</logback-classic.version>
+    <jib-maven-plugin.version>2.3.0</jib-maven-plugin.version>
+    <hazelcast-kubernetes.version>1.5.3</hazelcast-kubernetes.version>
+    <micrometer-registry-prometheus.version>1.4.2</micrometer-registry-prometheus.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-stack-depchain</artifactId>
+        <version>${vertx.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+</project>
