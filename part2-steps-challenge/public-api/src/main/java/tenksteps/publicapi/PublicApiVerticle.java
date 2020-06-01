@@ -215,7 +215,7 @@ public class PublicApiVerticle extends AbstractVerticle {
 
   private void handleAuthError(RoutingContext ctx, Throwable err) {
     if (err instanceof OpenCircuitException) {
-      logger.error("Circuit breaker is closed: {}", tokenCircuitBreaker.name());
+      logger.error("Circuit breaker is opened: {}", tokenCircuitBreaker.name());
       ctx.fail(504);
     } else if (err instanceof TimeoutException) {
       logger.error("Circuit breaker timeout: {}", tokenCircuitBreaker.name());
