@@ -105,7 +105,7 @@ class UserBehavior(TaskSet):
       if response.status_code in (200, 404):
         response.success()
 
-class UserWithDevice(HttpLocust):
-  task_set = UserBehavior
+class UserWithDevice(HttpUser):
+  tasks = [UserBehavior]
   host = "http://localhost"
   wait_time = between(0.5, 2.0)
