@@ -24,6 +24,12 @@ dependencies {
   implementation("ch.qos.logback:logback-classic:1.2.3")
 }
 
+tasks.create<JavaExec>("run") {
+  main = project.properties.getOrDefault("mainClass", "chapter5.callbacks.Main") as String
+  classpath = sourceSets["main"].runtimeClasspath
+  systemProperties["vertx.logger-delegate-factory-class-name"] = "io.vertx.core.logging.SLF4JLogDelegateFactory"
+}
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class HeatApi extends AbstractVerticle {
 
@@ -83,13 +84,16 @@ public class HeatApi extends AbstractVerticle {
   }
 
   private void sensorsOverLimits(RoutingContext routingContext) {
+    Predicate<JsonObject> abnormalValue = json -> {
+      Double temperature = json.getDouble("temp");
+      return (temperature <= lowLimit) || (highLimit <= temperature);
+    };
     fetchData(routingContext, resp -> {
       JsonObject data = resp.body();
       JsonArray warnings = new JsonArray();
       data.getJsonArray("data").stream()
         .map(JsonObject.class::cast)
-        .filter(value -> value.getDouble("temp") <= lowLimit)
-        .filter(value -> value.getDouble("temp") >= highLimit)
+        .filter(abnormalValue)
         .forEach(warnings::add);
       data.put("data", warnings);
       routingContext.response()

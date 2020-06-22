@@ -7,7 +7,7 @@ import java.io.IOException;
 public class JdkStreams {
 
   public static void main(String[] args) {
-    File file = new File("build.gradle");
+    File file = new File("build.gradle.kts");
     byte[] buffer = new byte[1024];
     try (FileInputStream in = new FileInputStream(file)) {
       int count = in.read(buffer);

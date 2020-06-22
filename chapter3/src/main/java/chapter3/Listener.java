@@ -19,8 +19,8 @@ public class Listener extends AbstractVerticle {
     bus.<JsonObject>consumer("sensor.updates", msg -> {
       JsonObject body = msg.body();
       String id = body.getString("id");
-      String temp = format.format(body.getDouble("temp"));
-      logger.info("{} reports a temperature ~{}C", id, temp);
+      String temperature = format.format(body.getDouble("temp"));
+      logger.info("{} reports a temperature ~{}C", id, temperature);
     });
   }
 }

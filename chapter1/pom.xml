@@ -13,6 +13,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vertx.version>4.0.0-SNAPSHOT</vertx.version>
     <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+    <mainClass>chapter1.firstapp.VertxEcho</mainClass>
   </properties>
 
   <dependencyManagement>
@@ -49,7 +50,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>chapter1.firstapp.VertxEcho</mainClass>
+          <mainClass>${mainClass}</mainClass>
         </configuration>
       </plugin>
     </plugins>

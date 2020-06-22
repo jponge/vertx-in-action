@@ -19,7 +19,7 @@ java {
 }
 
 application {
-  mainClassName = "chapter1.firstapp.VertxEcho"
+  mainClassName = project.properties.getOrDefault("mainClass", "chapter1.firstapp.VertxEcho") as String
 }
 
 tasks.wrapper {

@@ -9,8 +9,8 @@ import java.util.UUID;
 public class HeatSensor extends AbstractVerticle {
 
   private final Random random = new Random();
-  private final String id = UUID.randomUUID().toString();
-  private double temp = 21.0;
+  private final String sensorId = UUID.randomUUID().toString();
+  private double temperature = 21.0;
 
   @Override
   public void start() {
@@ -21,11 +21,11 @@ public class HeatSensor extends AbstractVerticle {
     vertx.setTimer(random.nextInt(5000) + 1000, this::update);
   }
 
-  private void update(long tid) {
-    temp = temp + (delta() / 10);
+  private void update(long timerId) {
+    temperature = temperature + (delta() / 10);
     JsonObject payload = new JsonObject()
-      .put("id", id)
-      .put("temp", temp);
+      .put("id", sensorId)
+      .put("temp", temperature);
     vertx.eventBus().publish("sensor.updates", payload);
     scheduleNextUpdate();
   }
