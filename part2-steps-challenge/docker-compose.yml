@@ -2,7 +2,7 @@ version: '2'
 services:
 
   mongo:
-    image: "mongo"
+    image: mongo:4-bionic
     ports:
       - "27017:27017"
     environment:
@@ -20,7 +20,7 @@ services:
       - ./init/postgres:/docker-entrypoint-initdb.d/
 
   zookeeper:
-    image: strimzi/zookeeper
+    image: strimzi/zookeeper:0.11.4-kafka-2.1.0
     command: [
       "sh", "-c",
       "bin/zookeeper-server-start.sh config/zookeeper.properties"
@@ -31,7 +31,7 @@ services:
       LOG_DIR: /tmp/logs
 
   kafka:
-    image: strimzi/kafka
+    image: strimzi/kafka:0.18.0-kafka-2.5.0
     command: [
       "sh", "-c",
       "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
@@ -47,12 +47,12 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
   artemis:
-    image: vromero/activemq-artemis:2-alpine-latest
+    image: vromero/activemq-artemis:2.13.0-alpine
     ports:
       - "5672:5672"
 
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:latest
     ports:
       - "1025:1025"
       - "8025:8025"
