@@ -17,8 +17,8 @@ public class UserWebAppVerticle extends AbstractVerticle {
   @Override
   public Completable rxStart() {
     Router router = Router.router(vertx);
-    router.get("/").handler(ctx -> ctx.reroute("/index.html"));
     router.route().handler(StaticHandler.create("webroot/assets"));
+    router.get("/*").handler(ctx -> ctx.reroute("/index.html"));
     return vertx.createHttpServer()
       .requestHandler(router)
       .rxListen(HTTP_PORT)

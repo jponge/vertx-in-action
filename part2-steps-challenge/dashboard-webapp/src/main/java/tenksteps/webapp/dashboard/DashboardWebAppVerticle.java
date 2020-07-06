@@ -67,8 +67,8 @@ public class DashboardWebAppVerticle extends AbstractVerticle {
     sockJSHandler.bridge(bridgeOptions);
     router.route("/eventbus/*").handler(sockJSHandler);
 
-    router.get("/").handler(ctx -> ctx.reroute("/index.html"));
     router.route().handler(StaticHandler.create("webroot/assets"));
+    router.get("/*").handler(ctx -> ctx.reroute("/index.html"));
 
     return vertx.createHttpServer()
       .requestHandler(router)
