@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 hey -z $2 \
     -m POST \
     -D auth.json \

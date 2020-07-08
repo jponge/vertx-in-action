@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 mkdir -p plots
 for f in data/hey-run*.csv; do

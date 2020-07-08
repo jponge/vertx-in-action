@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo 'NOTE: the token in this script may need to be updated'
 hey -z $2 \
     -o csv \

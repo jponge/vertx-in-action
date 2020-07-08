@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 function pumba_delay {
   echo "💥 Simulating traffic delays on $4 for $1 ($2 / $3)"
