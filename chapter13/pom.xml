@@ -21,7 +21,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <vertx.version>4.0.0-SNAPSHOT</vertx.version>
     <logback-classic.version>1.2.3</logback-classic.version>
-    <jib-maven-plugin.version>2.3.0</jib-maven-plugin.version>
+    <jib-maven-plugin.version>2.4.0</jib-maven-plugin.version>
     <hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>
     <micrometer-registry-prometheus.version>1.4.2</micrometer-registry-prometheus.version>
   </properties>
@@ -37,5 +37,25 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.google.cloud.tools</groupId>
+          <artifactId>jib-maven-plugin</artifactId>
+          <version>${jib-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>dockerBuild</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

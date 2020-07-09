@@ -40,7 +40,6 @@
       <plugin>
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
-        <version>${jib-maven-plugin.version}</version>
         <configuration>
           <from>
             <image>adoptopenjdk/openjdk11:ubi-minimal-jre</image>
@@ -65,14 +64,6 @@
             <user>nobody:nobody</user>
           </container>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>dockerBuild</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

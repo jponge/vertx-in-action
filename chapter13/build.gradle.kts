@@ -1,5 +1,5 @@
 plugins {
-  id("com.google.cloud.tools.jib") version "2.2.0" apply false
+  id("com.google.cloud.tools.jib") version "2.4.0" apply false
 }
 
 allprojects {
