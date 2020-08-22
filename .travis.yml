@@ -3,6 +3,7 @@ language: java
 branches:
   only:
     - master
+    - kafka-2.6
     - chapter12/public-api-with-timeouts
     - chapter12/public-api-with-circuit-breaker
     - chapter12/public-api-with-circuit-breaker-and-timeouts
