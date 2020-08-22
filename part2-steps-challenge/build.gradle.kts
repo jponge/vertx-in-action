@@ -12,7 +12,7 @@ allprojects {
   extra["restAssuredVersion"] = "4.3.0"
   extra["logbackClassicVersion"] = "1.2.3"
   extra["assertjVersion"] = "3.15.0"
-  extra["testContainersVersion"] = "1.13.0"
+  extra["testContainersVersion"] = "1.14.3"
 }
 
 subprojects {
