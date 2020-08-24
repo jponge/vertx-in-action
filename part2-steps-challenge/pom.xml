@@ -30,8 +30,8 @@
     <junit.jupiter.version>5.6.2</junit.jupiter.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <maven-shade-plugin.version>3.2.3</maven-shade-plugin.version>
-    <rest-assured.version>4.3.0</rest-assured.version>
-    <assertj-core.version>3.15.0</assertj-core.version>
+    <rest-assured.version>4.3.1</rest-assured.version>
+    <assertj-core.version>3.17.0</assertj-core.version>
     <junit-jupiter.version>1.13.0</junit-jupiter.version>
     <testcontainers.version>1.14.3</testcontainers.version>
     <frontend-maven-plugin.version>1.10.0</frontend-maven-plugin.version>
