@@ -1,7 +1,9 @@
+import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
+
 plugins {
   id("com.github.ben-manes.versions") version "0.29.0"
+  id("com.adarshr.test-logger") version "2.1.0"
   id("com.github.johnrengelman.shadow") version "6.0.0" apply false
-  id("com.adarshr.test-logger") version "2.1.0" apply false
   id("com.moowork.node") version "1.3.1" apply false
   id("org.gradle.test-retry") version "1.1.9" apply false
 }
@@ -36,6 +38,13 @@ subprojects {
 
   tasks.named<Test>("test") {
     reports.html.isEnabled = false
+  }
+
+  testlogger {
+    theme = MOCHA
+    slowThreshold = 5000
+    showStandardStreams = true
+    showFullStackTraces = true
   }
 }
 
