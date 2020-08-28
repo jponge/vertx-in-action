@@ -16,18 +16,30 @@
 
 package chapter6.reactivex;
 
+import io.vertx.reactivex.RxHelper;
+import io.vertx.reactivex.ObservableHelper;
+import io.vertx.reactivex.FlowableHelper;
+import io.vertx.reactivex.impl.AsyncResultMaybe;
+import io.vertx.reactivex.impl.AsyncResultSingle;
+import io.vertx.reactivex.impl.AsyncResultCompletable;
+import io.vertx.reactivex.WriteStreamObserver;
+import io.vertx.reactivex.WriteStreamSubscriber;
 import java.util.Map;
-import io.reactivex.Observable;
-import io.reactivex.Flowable;
-import io.reactivex.Single;
-import io.reactivex.Completable;
-import io.reactivex.Maybe;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.AsyncResult;
+import java.util.Set;
+import java.util.List;
+import java.util.Iterator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import io.vertx.core.Handler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.lang.rx.RxGen;
+import io.vertx.lang.rx.TypeArg;
+import io.vertx.lang.rx.MappingIterator;
 
 
-@io.vertx.lang.rx.RxGen(chapter6.SensorDataService.class)
+@RxGen(chapter6.SensorDataService.class)
 public class SensorDataService {
 
   @Override
@@ -48,7 +60,7 @@ public class SensorDataService {
     return delegate.hashCode();
   }
 
-  public static final io.vertx.lang.rx.TypeArg<SensorDataService> __TYPE_ARG = new io.vertx.lang.rx.TypeArg<>(    obj -> new SensorDataService((chapter6.SensorDataService) obj),
+  public static final TypeArg<SensorDataService> __TYPE_ARG = new TypeArg<>(    obj -> new SensorDataService((chapter6.SensorDataService) obj),
     SensorDataService::getDelegate
   );
 
@@ -84,8 +96,8 @@ public class SensorDataService {
     valueFor(sensorId, ar -> { });
   }
 
-  public Single<JsonObject> rxValueFor(String sensorId) { 
-    return io.vertx.reactivex.impl.AsyncResultSingle.toSingle($handler -> {
+  public io.reactivex.Single<JsonObject> rxValueFor(String sensorId) { 
+    return AsyncResultSingle.toSingle($handler -> {
       valueFor(sensorId, $handler);
     });
   }
@@ -98,8 +110,8 @@ public class SensorDataService {
     average(ar -> { });
   }
 
-  public Single<JsonObject> rxAverage() { 
-    return io.vertx.reactivex.impl.AsyncResultSingle.toSingle($handler -> {
+  public io.reactivex.Single<JsonObject> rxAverage() { 
+    return AsyncResultSingle.toSingle($handler -> {
       average($handler);
     });
   }
