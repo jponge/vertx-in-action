@@ -3,7 +3,7 @@ plugins {
 }
 
 allprojects {
-  extra["vertxVersion"] = "4.0.0.Beta2"
+  extra["vertxVersion"] = "4.0.0.Beta3"
   extra["hzVersion"] = "2.0.1"
   extra["logbackClassicVersion"] = "1.2.3"
   extra["mpromVersion"] = "1.4.2"
@@ -28,5 +28,5 @@ subprojects {
 
 tasks.wrapper {
   distributionType = Wrapper.DistributionType.ALL
-  gradleVersion = "6.3"
+  gradleVersion = "6.6.1"
 }

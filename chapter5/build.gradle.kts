@@ -13,12 +13,12 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0.Beta2")
-  implementation("io.vertx:vertx-rx-java2:4.0.0.Beta2")
-  implementation("io.vertx:vertx-web-client:4.0.0.Beta2")
+  implementation("io.vertx:vertx-core:4.0.0.Beta3")
+  implementation("io.vertx:vertx-rx-java2:4.0.0.Beta3")
+  implementation("io.vertx:vertx-web-client:4.0.0.Beta3")
 
-  implementation("io.vertx:vertx-lang-kotlin:4.0.0.Beta2")
-  implementation("io.vertx:vertx-lang-kotlin-coroutines:4.0.0.Beta2")
+  implementation("io.vertx:vertx-lang-kotlin:4.0.0.Beta3")
+  implementation("io.vertx:vertx-lang-kotlin-coroutines:4.0.0.Beta3")
   implementation(kotlin("stdlib-jdk8"))
 
   implementation("ch.qos.logback:logback-classic:1.2.3")
@@ -34,5 +34,5 @@ val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
 
 tasks.wrapper {
-  gradleVersion = "6.3"
+  gradleVersion = "6.6.1"
 }

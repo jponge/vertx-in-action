@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0.Beta2")
+  implementation("io.vertx:vertx-core:4.0.0.Beta3")
 }
 
 java {
@@ -23,5 +23,5 @@ application {
 }
 
 tasks.wrapper {
-  gradleVersion = "6.3"
+  gradleVersion = "6.6.1"
 }
