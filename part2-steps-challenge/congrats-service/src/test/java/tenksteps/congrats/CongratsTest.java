@@ -38,7 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CongratsTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("src/test/docker/docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("src/test/docker/docker-compose.yml"))
+    .withExposedService("kafka_1", 9092)
+    .withExposedService("mailhog_1", 8025);
 
   private KafkaProducer<String, JsonObject> producer;
   private WebClient webClient;

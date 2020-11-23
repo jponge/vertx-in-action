@@ -40,7 +40,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IntegrationTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"))
+    .withExposedService("artemis_1", 5672)
+    .withExposedService("kafka_1", 9092);
 
   private static RequestSpecification requestSpecification;
 

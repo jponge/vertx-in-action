@@ -40,12 +40,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IntegrationTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"))
+    .withExposedService("postgres_1", 5432)
+    .withExposedService("mongo_1", 27017)
+    .withExposedService("kafka_1", 9092);
 
   private RequestSpecification requestSpecification;
 
   @BeforeAll
-  void prepareSpec(Vertx vertx, VertxTestContext testContext) {
+  void prepareSpec(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
     requestSpecification = new RequestSpecBuilder()
       .addFilters(asList(new ResponseLoggingFilter(), new RequestLoggingFilter()))
       .setBaseUri("http://localhost:4000/")
