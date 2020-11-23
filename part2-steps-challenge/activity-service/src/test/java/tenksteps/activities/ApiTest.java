@@ -39,7 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ApiTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"))
+    .withExposedService("postgres_1", 5432)
+    .withExposedService("mongo_1", 27017);
 
   private static RequestSpecification requestSpecification;
 

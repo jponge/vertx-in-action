@@ -12,10 +12,9 @@ To build all services run:
     ./gradlew build
 
 Tests are being run as part of the build process, relying on container images to be started to run integration tests against various middleware such as _Apache Kafka_ or _PostgreSQL_.
-Things are not always deterministic when containers are being started, so you may encounter occasional _flaky_ tests.
-You may also not have enough resources to run all containers while running tests, which may explain potential errors.
+You may encounter occasional _flaky_ tests, and/or you may also not have enough resources to run all containers while running tests, which may explain potential errors.
 
-To build all services without running tests run:
+To build all services without running tests simply run:
 
     ./gradlew assemble
 

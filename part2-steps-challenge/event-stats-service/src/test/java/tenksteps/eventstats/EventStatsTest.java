@@ -30,7 +30,8 @@ import static org.assertj.core.data.Offset.offset;
 class EventStatsTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("src/test/docker/docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("src/test/docker/docker-compose.yml"))
+    .withExposedService("kafka_1", 9092);
 
   private KafkaProducer<String, JsonObject> producer;
   private KafkaConsumer<String, JsonObject> consumer;

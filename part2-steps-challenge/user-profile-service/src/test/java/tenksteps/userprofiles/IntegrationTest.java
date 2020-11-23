@@ -33,7 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IntegrationTest {
 
   @Container
-  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"));
+  private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"))
+    .withExposedService("mongo_1", 27017);
 
   private static RequestSpecification requestSpecification;
 

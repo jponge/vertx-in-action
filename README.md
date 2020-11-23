@@ -28,28 +28,28 @@ The book examples work best using some Unix environment: Linux, macOS or the Win
 
 The following folders are available:
 
-* `chapter1`
-* `chapter2`
-* `chapter3`
-* `chapter4`
-* `chapter5`
-* `chapter6`
-* `part2-steps-challenge` (covers chapters 7 to 12)
-* `chapter13`
+- `chapter1`
+- `chapter2`
+- `chapter3`
+- `chapter4`
+- `chapter5`
+- `chapter6`
+- `part2-steps-challenge` (covers chapters 7 to 12)
+- `chapter13`
 
 The `master` branch is where you must look for working examples.
 
 Chapter 12 provides variants of the same code which you can get from the following branches:
 
-* `chapter12/public-api-with-timeouts`
-* `chapter12/public-api-with-circuit-breaker`
-* `chapter12/public-api-with-circuit-breaker-and-timeouts`
+- `chapter12/public-api-with-timeouts`
+- `chapter12/public-api-with-circuit-breaker`
+- `chapter12/public-api-with-circuit-breaker-and-timeouts`
 
 ## Will there be updates?
 
 The book went to production with Manning in August 2020.
 
-This repository contains samples against Eclipse Vert.x 4.0.0.Beta3 (see tag `vertx-4.0.0.Beta3`) that was released in September 2020.
+This repository contains samples against Eclipse Vert.x 4.0.0.CR2 (see tag `vertx-4.0.0.CR2`) that was released in November 2020.
 
 At my own discretion I _may_ update to newer versions of Vert.x when they are published.
 
@@ -68,3 +68,19 @@ If you have a question on Vert.x then please get in touch with the [Eclipse Vert
 There are several channels that you can use including public mailing-lists and chat.
 
 If you have a problem with your book order or any special request, then please contact Manning.
+
+## Errata
+
+### November 2020
+
+Due to a peculiarities in how _TestContainers_ supports _Docker Compose_ it may be necessary to explicitly await for containers to be exposed, or test executions can sometimes fail because a container port hasn't been exposed yet.
+
+This can be done by calling the `withExposedService` method on a `DockerComposeContainer` instance, as in:
+
+```java
+@Container
+private static final DockerComposeContainer CONTAINERS = new DockerComposeContainer(new File("../docker-compose.yml"))
+  .withExposedService("mongo_1", 27017);
+```
+
+This fix has been applied to the tests in `part2-steps-challenge`.
