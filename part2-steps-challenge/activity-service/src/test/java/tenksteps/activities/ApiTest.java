@@ -54,8 +54,7 @@ public class ApiTest {
   }
 
   @BeforeEach
-  void prepareDb(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
-    Thread.sleep(5000); // Fix a bug in TestContainers where the test could start before PostgreSQL is ready
+  void prepareDb(Vertx vertx, VertxTestContext testContext) {
     String insertQuery = "INSERT INTO stepevent VALUES($1, $2, $3::timestamp, $4)";
     LocalDateTime now = LocalDateTime.now();
     List<Tuple> data = Arrays.asList(

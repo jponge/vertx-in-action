@@ -48,7 +48,7 @@ class IntegrationTest {
   private RequestSpecification requestSpecification;
 
   @BeforeAll
-  void prepareSpec(Vertx vertx, VertxTestContext testContext) throws InterruptedException {
+  void prepareSpec(Vertx vertx, VertxTestContext testContext) {
     requestSpecification = new RequestSpecBuilder()
       .addFilters(asList(new ResponseLoggingFilter(), new RequestLoggingFilter()))
       .setBaseUri("http://localhost:4000/")
