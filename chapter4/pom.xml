@@ -11,7 +11,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vertx.version>4.0.0.CR2</vertx.version>
+    <vertx.version>4.0.0</vertx.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
     <mainClass>chapter4.jukebox.Main</mainClass>

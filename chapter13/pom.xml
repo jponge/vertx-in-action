@@ -19,7 +19,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vertx.version>4.0.0.CR2</vertx.version>
+    <vertx.version>4.0.0</vertx.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <jib-maven-plugin.version>2.4.0</jib-maven-plugin.version>
     <hazelcast-kubernetes.version>2.0.1</hazelcast-kubernetes.version>

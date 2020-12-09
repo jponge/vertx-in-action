@@ -49,7 +49,7 @@ Chapter 12 provides variants of the same code which you can get from the followi
 
 The book went to production with Manning in August 2020.
 
-This repository contains samples against Eclipse Vert.x 4.0.0.CR2 (see tag `vertx-4.0.0.CR2`) that was released in November 2020.
+This repository contains samples against Eclipse Vert.x 4.0.0 (see tag `vertx-4.0.0`) that was released in December 2020.
 
 At my own discretion I _may_ update to newer versions of Vert.x when they are published.
 
