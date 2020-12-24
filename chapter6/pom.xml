@@ -99,6 +99,9 @@
           <annotationProcessors>
             <annotationProcessor>io.vertx.codegen.CodeGenProcessor</annotationProcessor>
           </annotationProcessors>
+          <compilerArgs>
+            <arg>-Acodegen.output=${project.basedir}/src/main/generated</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
