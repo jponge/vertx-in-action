@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-  implementation("io.vertx:vertx-core:4.0.0")
+  implementation("io.vertx:vertx-core:4.0.3")
   implementation("ch.qos.logback:logback-classic:1.2.3")
 }
 
@@ -29,5 +29,5 @@ java {
 }
 
 tasks.wrapper {
-  gradleVersion = "6.6.1"
+  gradleVersion = "6.8.3"
 }

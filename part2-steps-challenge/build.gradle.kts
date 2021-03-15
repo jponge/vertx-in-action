@@ -1,20 +1,20 @@
 import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA
 
 plugins {
-  id("com.github.ben-manes.versions") version "0.36.0"
+  id("com.github.ben-manes.versions") version "0.38.0"
   id("com.adarshr.test-logger") version "2.1.1"
   id("com.github.johnrengelman.shadow") version "6.1.0" apply false
   id("com.moowork.node") version "1.3.1" apply false
-  id("org.gradle.test-retry") version "1.1.9" apply false
+  id("org.gradle.test-retry") version "1.2.0" apply false
 }
 
 allprojects {
-  extra["vertxVersion"] = if (project.hasProperty("vertxVersion")) project.property("vertxVersion") else "4.0.0"
-  extra["junit5Version"] = "5.7.0"
-  extra["restAssuredVersion"] = "4.3.2"
+  extra["vertxVersion"] = if (project.hasProperty("vertxVersion")) project.property("vertxVersion") else "4.0.3"
+  extra["junit5Version"] = "5.7.1"
+  extra["restAssuredVersion"] = "4.3.3"
   extra["logbackClassicVersion"] = "1.2.3"
-  extra["assertjVersion"] = "3.18.0"
-  extra["testContainersVersion"] = "1.15.0"
+  extra["assertjVersion"] = "3.19.0"
+  extra["testContainersVersion"] = "1.15.2"
 }
 
 subprojects {
@@ -57,5 +57,5 @@ tasks.register<TestReport>("testReport") {
 
 tasks.wrapper {
   distributionType = Wrapper.DistributionType.ALL
-  gradleVersion = "6.7"
+  gradleVersion = "6.8.3"
 }

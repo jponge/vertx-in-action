@@ -11,10 +11,10 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vertx.version>4.0.0</vertx.version>
+    <vertx.version>4.0.3</vertx.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
-    <junit.jupiter.version>5.6.2</junit.jupiter.version>
+    <junit.jupiter.version>5.7.1</junit.jupiter.version>
     <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
     <mainClass>chapter6.RxProxyClient</mainClass>
     <assertj-core.version>3.11.1</assertj-core.version>
