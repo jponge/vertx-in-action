@@ -12,19 +12,15 @@ public class Offload extends AbstractVerticle {
   public void start() {
     vertx.setPeriodic(5000, id -> {
       logger.info("Tick");
-      vertx.executeBlocking(this::blockingCode, this::resultHandler);
+      vertx.executeBlocking(this::blockingCode).onComplete(this::resultHandler);
     });
   }
 
-  private void blockingCode(Promise<String> promise) {
+  private String blockingCode() throws Exception {
     logger.info("Blocking code running");
-    try {
-      Thread.sleep(4000);
-      logger.info("Done!");
-      promise.complete("Ok!");
-    } catch (InterruptedException e) {
-      promise.fail(e);
-    }
+    Thread.sleep(4000);
+    logger.info("Done!");
+    return "Ok!";
   }
 
   private void resultHandler(AsyncResult<String> ar) {

@@ -2,8 +2,7 @@ package chapter6;
 
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
@@ -19,7 +18,7 @@ public interface SensorDataService {
     return new SensorDataServiceVertxEBProxy(vertx, address);
   }
 
-  void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> valueFor(String sensorId);
 
-  void average(Handler<AsyncResult<JsonObject>> handler);
+  Future<JsonObject> average();
 }

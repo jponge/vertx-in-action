@@ -49,7 +49,7 @@ public class Jukebox extends AbstractVerticle {
   // --------------------------------------------------------------------------------- //
 
   private void list(Message<?> request) {
-    vertx.fileSystem().readDir("tracks", ".*mp3$", ar -> {
+    vertx.fileSystem().readDir("tracks", ".*mp3$").onComplete(ar -> {
       if (ar.succeeded()) {
         List<String> files = ar.result()
           .stream()
@@ -127,7 +127,7 @@ public class Jukebox extends AbstractVerticle {
       return;
     }
     OpenOptions opts = new OpenOptions().setRead(true);
-    vertx.fileSystem().open(file, opts, ar -> {
+    vertx.fileSystem().open(file, opts).onComplete(ar -> {
       if (ar.succeeded()) {
         downloadFile(ar.result(), request);
       } else {
@@ -178,7 +178,7 @@ public class Jukebox extends AbstractVerticle {
     if (currentFile == null) {
       openNextFile();
     }
-    currentFile.read(Buffer.buffer(4096), 0, positionInFile, 4096, ar -> {
+    currentFile.read(Buffer.buffer(4096), 0, positionInFile, 4096).onComplete(ar -> {
       if (ar.succeeded()) {
         processReadBuffer(ar.result());
       } else {

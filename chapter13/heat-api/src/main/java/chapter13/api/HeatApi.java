@@ -3,6 +3,7 @@ package chapter13.api;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpResponseExpectation;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
@@ -10,7 +11,6 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import io.vertx.ext.web.client.WebClientOptions;
-import io.vertx.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.ext.web.codec.BodyCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class HeatApi extends AbstractVerticle {
 
     vertx.createHttpServer()
       .requestHandler(router)
-      .listen(httpPort, ar -> {
+      .listen(httpPort).onComplete(ar -> {
         if (ar.succeeded()) {
           logger.info("HTTP server listening on port {}", httpPort);
           startPromise.complete();
@@ -63,9 +63,10 @@ public class HeatApi extends AbstractVerticle {
   private void fetchData(RoutingContext routingContext, Consumer<HttpResponse<JsonObject>> action) {
     webClient.get("/data")
       .as(BodyCodec.jsonObject())
-      .expect(ResponsePredicate.SC_OK)
       .timeout(5000)
-      .send(ar -> {
+      .send()
+      .expecting(HttpResponseExpectation.SC_OK)
+      .onComplete(ar -> {
         if (ar.succeeded()) {
           action.accept(ar.result());
         } else {
@@ -114,9 +115,10 @@ public class HeatApi extends AbstractVerticle {
 
   private void readinessCheck(RoutingContext ctx) {
     webClient.get("/health")
-      .expect(ResponsePredicate.SC_OK)
       .timeout(5000)
-      .send(ar -> {
+      .send()
+      .expecting(HttpResponseExpectation.SC_OK)
+      .onComplete(ar -> {
         if (ar.succeeded()) {
           logger.info("Readiness check complete");
           ctx.response()

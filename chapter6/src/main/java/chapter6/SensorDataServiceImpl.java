@@ -21,22 +21,22 @@ class SensorDataServiceImpl implements SensorDataService {
   }
 
   @Override
-  public void valueFor(String sensorId, Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> valueFor(String sensorId) {
     if (lastValues.containsKey(sensorId)) {
       JsonObject data = new JsonObject()
         .put("sensorId", sensorId)
         .put("value", lastValues.get(sensorId));
-      handler.handle(Future.succeededFuture(data));
+      return Future.succeededFuture(data);
     } else {
-      handler.handle(Future.failedFuture("No value has been observed for " + sensorId));
+      return Future.failedFuture("No value has been observed for " + sensorId);
     }
   }
 
   @Override
-  public void average(Handler<AsyncResult<JsonObject>> handler) {
+  public Future<JsonObject> average() {
     double avg = lastValues.values().stream()
       .collect(Collectors.averagingDouble(Double::doubleValue));
     JsonObject data = new JsonObject().put("average", avg);
-    handler.handle(Future.succeededFuture(data));
+    return Future.succeededFuture(data);
   }
 }

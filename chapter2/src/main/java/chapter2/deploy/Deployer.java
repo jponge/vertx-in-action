@@ -18,7 +18,7 @@ public class Deployer extends AbstractVerticle {
   }
 
   private void deploy() {
-    vertx.deployVerticle(new EmptyVerticle(), ar -> {   // <2>
+    vertx.deployVerticle(new EmptyVerticle()).onComplete(ar -> {   // <2>
       if (ar.succeeded()) {
         String id = ar.result();
         logger.info("Successfully deployed {}", id);
@@ -30,7 +30,7 @@ public class Deployer extends AbstractVerticle {
   }
 
   private void undeployLater(String id) {
-    vertx.undeploy(id, ar -> {  // <4>
+    vertx.undeploy(id).onComplete(ar -> {  // <4>
       if (ar.succeeded()) {
         logger.info("{} was undeployed", id);
       } else {

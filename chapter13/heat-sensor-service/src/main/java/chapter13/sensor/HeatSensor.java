@@ -57,7 +57,8 @@ public class HeatSensor extends AbstractVerticle {
 
     vertx.createHttpServer()
       .requestHandler(router)
-      .listen(httpPort, ar -> {
+      .listen(httpPort)
+      .onComplete(ar -> {
         if (ar.succeeded()) {
           logger.info("HTTP server listening on port {}", httpPort);
           startPromise.complete();
@@ -97,7 +98,7 @@ public class HeatSensor extends AbstractVerticle {
       .setEventBusOptions(new EventBusOptions()
         .setHost(ipv4)
         .setClusterPublicHost(ipv4));
-    Vertx.clusteredVertx(options, ar -> {
+    Vertx.clusteredVertx(options).onComplete(ar -> {
       if (ar.succeeded()) {
         ar.result().deployVerticle(new HeatSensor());
       } else {

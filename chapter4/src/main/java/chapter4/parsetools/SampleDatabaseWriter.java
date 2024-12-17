@@ -41,6 +41,6 @@ public class SampleDatabaseWriter {
       .appendInt(value.length())
       .appendString(value);
 
-    file.end(buffer, ar -> vertx.close());
+    file.end(buffer).onComplete(ar -> vertx.close());
   }
 }
