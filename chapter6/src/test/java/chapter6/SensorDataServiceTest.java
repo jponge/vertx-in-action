@@ -19,7 +19,7 @@ class SensorDataServiceTest {
 
   @BeforeEach
   void prepare(Vertx vertx, VertxTestContext ctx) {
-    vertx.deployVerticle(new DataVerticle(), ctx.succeeding(id -> {
+    vertx.deployVerticle(new DataVerticle()).onComplete(ctx.succeeding(id -> {
       dataService = SensorDataService.createProxy(vertx, "sensor.data-service");
       ctx.completeNow();
     }));
@@ -30,12 +30,12 @@ class SensorDataServiceTest {
     Checkpoint failsToGet = ctx.checkpoint();
     Checkpoint zeroAvg = ctx.checkpoint();
 
-    dataService.valueFor("abc", ctx.failing(err -> ctx.verify(() -> {
+    dataService.valueFor("abc").onComplete(ctx.failing(err -> ctx.verify(() -> {
       assertThat(err.getMessage()).startsWith("No value has been observed");
       failsToGet.flag();
     })));
 
-    dataService.average(ctx.succeeding(data -> ctx.verify(() -> {
+    dataService.average().onComplete(ctx.succeeding(data -> ctx.verify(() -> {
       double avg = data.getDouble("average");
       assertThat(avg).isCloseTo(0.0d, withPercentage(1.0d));
       zeroAvg.flag();
@@ -55,13 +55,13 @@ class SensorDataServiceTest {
       .publish("sensor.updates", m1)
       .publish("sensor.updates", m2);
 
-    dataService.valueFor("abc", ctx.succeeding(data -> ctx.verify(() -> {
+    dataService.valueFor("abc").onComplete(ctx.succeeding(data -> ctx.verify(() -> {
       assertThat(data.getString("sensorId")).isEqualTo("abc");
       assertThat(data.getDouble("value")).isEqualTo(21.0d);
       getValue.flag();
     })));
 
-    dataService.average(ctx.succeeding(data -> ctx.verify(() -> {
+    dataService.average().onComplete(ctx.succeeding(data -> ctx.verify(() -> {
       assertThat(data.getDouble("average")).isCloseTo(22.0, withPercentage(1.0d));
       goodAvg.flag();
     })));

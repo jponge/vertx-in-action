@@ -1,7 +1,6 @@
 package chapter3;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.TimeoutStream;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
@@ -40,9 +39,8 @@ public class HttpServer extends AbstractVerticle {
     });
 
 
-    TimeoutStream ticks = vertx.periodicStream(1000);
-    ticks.handler(id -> {
-      vertx.eventBus().<JsonObject>request("sensor.average", "", reply -> {
+    long periodic = vertx.setPeriodic(1000, id -> {
+      vertx.eventBus().<JsonObject>request("sensor.average", "").onComplete(reply -> {
         if (reply.succeeded()) {
           response.write("event: average\n");
           response.write("data: " + reply.result().body().encode() + "\n\n");
@@ -52,7 +50,7 @@ public class HttpServer extends AbstractVerticle {
 
     response.endHandler(v -> {
       consumer.unregister();
-      ticks.cancel();
+      vertx.cancelTimer(periodic);
     });
   }
 }

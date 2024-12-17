@@ -1,11 +1,11 @@
 package chapter5.callbacks;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.http.HttpResponseExpectation;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.WebClient;
-import io.vertx.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.ext.web.codec.BodyCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +33,10 @@ public class CollectorServiceCBH extends AbstractVerticle {
     for (int i = 0; i < 3; i++) {
       webClient
         .get(3000 + i, "localhost", "/")
-        .expect(ResponsePredicate.SC_SUCCESS)
         .as(BodyCodec.jsonObject())
-        .send(ar -> {
+        .send()
+        .expecting(HttpResponseExpectation.SC_OK)
+        .onComplete(ar -> {
           if (ar.succeeded()) {
             responses.add(ar.result().body());
           } else {
@@ -46,8 +47,9 @@ public class CollectorServiceCBH extends AbstractVerticle {
               .put("data", new JsonArray(responses));
             webClient
               .post(4000, "localhost", "/")
-              .expect(ResponsePredicate.SC_SUCCESS)
-              .sendJsonObject(data, ar1 -> {
+              .sendJsonObject(data)
+              .expecting(HttpResponseExpectation.SC_OK)
+              .onComplete(ar1 -> {
                 if (ar1.succeeded()) {
                   request.response()
                     .putHeader("Content-Type", "application/json")

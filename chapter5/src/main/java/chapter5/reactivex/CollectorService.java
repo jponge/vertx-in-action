@@ -5,10 +5,10 @@ import io.reactivex.Single;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.core.http.HttpResponseExpectation;
 import io.vertx.reactivex.core.http.HttpServerRequest;
 import io.vertx.reactivex.ext.web.client.HttpResponse;
 import io.vertx.reactivex.ext.web.client.WebClient;
-import io.vertx.reactivex.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.reactivex.ext.web.codec.BodyCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,16 +57,16 @@ public class CollectorService extends AbstractVerticle {
   private Single<HttpResponse<JsonObject>> fetchTemperature(int port) {
     return webClient
       .get(port, "localhost", "/")
-      .expect(ResponsePredicate.SC_SUCCESS)
       .as(BodyCodec.jsonObject())
-      .rxSend();
+      .rxSend()
+      .compose(HttpResponseExpectation.status(200));
   }
 
   private Single<JsonObject> sendToSnapshot(Single<JsonObject> data) {
     return data.flatMap(json -> webClient
       .post(4000, "localhost", "")
-      .expect(ResponsePredicate.SC_SUCCESS)
       .rxSendJsonObject(json)
+      .compose(HttpResponseExpectation.status(200))
       .flatMap(resp -> Single.just(json)));
   }
 }

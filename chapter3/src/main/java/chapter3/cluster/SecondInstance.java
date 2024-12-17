@@ -13,7 +13,7 @@ public class SecondInstance {
   private static final Logger logger = LoggerFactory.getLogger(SecondInstance.class);
 
   public static void main(String[] args) {
-    Vertx.clusteredVertx(new VertxOptions(), ar -> {
+    Vertx.clusteredVertx(new VertxOptions()).onComplete(ar -> {
       if (ar.succeeded()) {
         logger.info("Second instance has been started");
         Vertx vertx = ar.result();

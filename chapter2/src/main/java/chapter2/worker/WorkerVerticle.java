@@ -3,6 +3,7 @@ package chapter2.worker;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
+import io.vertx.core.ThreadingModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class WorkerVerticle extends AbstractVerticle{
     Vertx vertx = Vertx.vertx();
     DeploymentOptions opts = new DeploymentOptions()
       .setInstances(2)
-      .setWorker(true);
+      .setThreadingModel(ThreadingModel.WORKER);
     vertx.deployVerticle("chapter2.worker.WorkerVerticle", opts);
   }
 }
